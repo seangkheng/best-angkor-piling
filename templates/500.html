@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Internal Server Error | កំហុសម៉ាស៊ីនមេខាងក្នុង{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 50px;">
+    <h1 style="font-size: 4em; color: #dc3545;">500</h1>
+    <h2 style="color: #333;">Internal Server Error | កំហុសម៉ាស៊ីនមេខាងក្នុង</h2>
+    <p style="font-size: 1.2em; color: #555;">Something went wrong on our end. Please try again later. | មានអ្វីមួយខុសប្រក្រតីនៅខាងយើង។ សូមព្យាយាមម្តងទៀតនៅពេលក្រោយ។</p>
+    <a href="{{ url_for('index') }}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Go to Homepage | ទៅកាន់ទំព័រដើម</a>
+</div>
+{% endblock %}

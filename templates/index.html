@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | ទំព័រដើម{% endblock %}
+
+{% block content %}
+<style>
+    /* Specific styles for the dashboard info cards */
+    .info-cards {
+        display: flex;
+        gap: 20px;
+        justify-content: space-around;
+        text-align: center;
+        margin-bottom: 40px;
+        flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+    }
+
+    .card {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        width: 23%; /* Adjust width for 4 cards per row */
+        border-left: 5px solid #0056b3; /* Default blue border */
+        flex-grow: 1; /* Allow cards to grow */
+        min-width: 200px; /* Minimum width for cards */
+    }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.3; /* Adjust line height for Khmer text */
+        }
+
+        .card p {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #0056b3;
+            margin: 10px 0 0 0;
+        }
+
+        /* Specific border colors for different card types */
+        .card.total-piles {
+            border-color: #0056b3;
+        }
+        /* Blue */
+        .card.low-stock {
+            border-color: #dc3545;
+        }
+        /* Red */
+        .card.total-sites {
+            border-color: #28a745;
+        }
+        /* Green */
+        .card.recent-transactions {
+            border-color: #ffc107;
+        }
+    /* Yellow/Orange */
+
+    /* Responsive adjustments for cards */
+    @media (max-width: 1024px) {
+        .card {
+            width: 48%; /* 2 cards per row on medium screens */
+        }
+    }
+
+    @media (max-width: 600px) {
+        .card {
+            width: 90%; /* 1 card per row on small screens */
+        }
+    }
+</style>
+
+<h2>Dashboard | ទិដ្ឋភាពទូទៅ</h2>
+
+<div class="info-cards">
+    <div class="card total-piles">
+        <h3>ប្រភេទសសរសរុប <br> Total Pile Types</h3>
+        <p>{{ piles|length }}</p>
+    </div>
+    <div class="card low-stock">
+        <h3>សសរកំពុងខ្វះស្តុក <br> Low Stock Items</h3>
+        <p>{{ low_stock_piles|length }}</p>
+    </div>
+    <div class="card total-sites">
+        <h3>ការដ្ឋានសរុប <br> Total Customer Sites</h3>
+        <p>{{ customer_sites|length }}</p>
+    </div>
+    <div class="card recent-transactions">
+        <h3>ប្រតិបត្តិការថ្មីៗ <br> Recent Transactions</h3>
+        <p>{{ recent_transactions|length }}</p>
+    </div>
+</div>
+
+
+<h3>Low Stock Piles (Threshold: {{ low_stock_threshold }}) | សសរដែលជិតអស់ពីស្តុក</h3>
+<table>
+    <thead>
+        <tr>
+            <th>SKU</th>
+            <th>Pile Type | ប្រភេទសសរ</th>
+            <th>Size | ទំហំ</th>
+            <th>Length (m) | ប្រវែង</th>
+            <th>Current Stock | ស្តុកបច្ចុប្បន្ន</th>
+            <th>Actions | សកម្មភាព</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pile in low_stock_piles %}
+        <tr>
+            <td data-label="SKU">{{ pile.sku }}</td>
+            <td data-label="Pile Type | ប្រភេទសសរ">{{ pile.pile_type }}</td>
+            <td data-label="Size | ទំហំ">{{ pile.size }}</td>
+            <td data-label="Length (m) | ប្រវែង">{{ "%.2f"|format(pile.length) }}</td>
+            <td data-label="Current Stock | ស្តុកបច្ចុប្បន្ន" style="color: red; font-weight: bold;">{{ pile.current_stock }}</td>
+            <td data-label="Actions | សកម្មភាព" class="actions">
+                {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
+                <a href="{{ url_for('edit_pile', pile_id=pile.id) }}" class="edit-button"><i class="fas fa-edit"></i> កែ</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">No piles are currently low on stock. | មិនមានសសរណាដែលខ្វះស្តុកទេ។</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

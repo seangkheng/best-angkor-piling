@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Customer Site - Best Angkor Piling App{% endblock %}
+
+{% block content %}
+<h2>Edit Customer Site: {{ site.name }} | កែសម្រួលការដ្ឋានអតិថិជន: {{ site.name }}</h2>
+<form method="POST" action="{{ url_for('edit_customer_site', site_id=site.id) }}">
+    <label for="name">Site Name | ឈ្មោះការដ្ឋាន:</label>
+    <input type="text" id="name" name="name" value="{{ site.name }}" required>
+
+    <label for="address">Address | អាសយដ្ឋាន:</label>
+    <textarea id="address" name="address" rows="3">{{ site.address if site.address is not none else '' }}</textarea>
+
+    <label for="phone">Phone Number | លេខទូរស័ព្ទ:</label>
+    <input type="text" id="phone" name="phone" value="{{ site.phone if site.phone is not none else '' }}">
+
+    <button type="submit"><i class="fas fa-sync-alt"></i> ធ្វើបច្ចុប្បន្នភាពការដ្ឋានអតិថិជន | Update Customer Site</button>
+    <a href="{{ url_for('manage_sites') }}" class="cancel-button"><i class="fas fa-times-circle"></i> បោះបង់ | Cancel</a>
+</form>
+{% endblock %}

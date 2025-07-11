@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}ចុះឈ្មោះអ្នកប្រើប្រាស់ | Register User{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>ចុះឈ្មោះអ្នកប្រើប្រាស់ថ្មី | Register New User</h2>
+    <form method="POST">
+        <label for="username">ឈ្មោះអ្នកប្រើប្រាស់ | Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">ពាក្យសម្ងាត់ | Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="role">តួនាទី | Role:</label>
+        <select id="role" name="role" required>
+            <option value="stock_keeper">អ្នកគ្រប់គ្រងស្តុក | Stock Keeper</option>
+            <option value="manager">អ្នកគ្រប់គ្រង | Manager</option>
+            <option value="admin">អ្នកគ្រប់គ្រងប្រព័ន្ធ | Admin</option>
+        </select>
+
+        <button type="submit"><i class="fas fa-user-plus"></i> ចុះឈ្មោះ | Register</button>
+        <a href="{{ url_for('login') }}" class="cancel-button"><i class="fas fa-sign-in-alt"></i> ត្រឡប់ទៅចូល | Back to Login</a>
+    </form>
+</div>
+{% endblock %}

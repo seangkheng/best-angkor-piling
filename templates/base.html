@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Best Angkor Piling App{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: 'Noto Sans Khmer', Arial, sans-serif; /* Changed font */
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px; /* Base font size for better readability */
+        }
+
+        /* Container for Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Headings */
+        h1, h2, h3 {
+            color: #333;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        h1 { font-size: 2.2em; }
+        h2 { font-size: 1.8em; }
+        h3 { font-size: 1.4em; }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            background-color: #0056b3;
+            padding: 10px 0;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+            .navbar a {
+                color: white;
+                padding: 10px 15px; /* Reduced padding */
+                text-decoration: none;
+                text-align: center;
+                display: inline-block;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                font-weight: 600;
+                font-size: 0.9em; /* Reduced font size for nav links */
+                display: flex; /* For icon alignment */
+                align-items: center;
+                gap: 5px; /* Space between icon and text */
+            }
+
+                .navbar a:hover, .navbar a.active {
+                    background-color: #004494;
+                    border-radius: 5px;
+                    transform: translateY(-2px);
+                }
+        
+        .user-info {
+            color: white;
+            padding: 10px 15px; /* Consistent with nav links */
+            display: inline-block;
+            font-weight: bold;
+            background-color: #004494;
+            border-radius: 5px;
+            margin: 0 8px; /* Reduced margin */
+            font-size: 0.9em;
+            display: flex; /* For icon alignment */
+            align-items: center;
+            gap: 5px; /* Space between icon and text */
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 10px; /* Reduced padding */
+            text-align: left;
+            font-size: 0.85em; /* Reduced font size for table content */
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        tr:hover {
+            background-color: #eef7ff;
+        }
+
+        /* Action Buttons in Tables */
+        .actions form {
+            display: inline-block;
+            margin: 0;
+        }
+
+        .actions button, .actions a {
+            padding: 4px 8px; /* Further reduced padding for smaller buttons */
+            border: none;
+            border-radius: 4px; /* Slightly less rounded */
+            cursor: pointer;
+            font-size: 0.7em; /* Smaller font */
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px; /* Reduced space between icon and text */
+            margin-right: 4px; /* Reduced space between action buttons */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+        }
+
+        .edit-button {
+            background-color: #007bff;
+            color: white;
+        }
+        .edit-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        /* Button Group Styles (for Add/Export buttons) */
+        .button-group {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 8px; /* Reduced space between buttons */
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+            .button-group a, .button-group button {
+                padding: 7px 12px; /* Reduced padding for smaller buttons */
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                font-size: 0.85em; /* Slightly smaller font */
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                font-weight: 600;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px; /* Reduced space for icon */
+            }
+
+        .add-button {
+            background-color: #28a745;
+        }
+        .add-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .export-btn {
+            background-color: #17a2b8;
+        }
+        .export-btn:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+        }
+
+        /* Form Styles */
+        form {
+            background-color: #f9f9f9;
+            padding: 20px; /* Reduced padding */
+            border-radius: 10px;
+            margin-bottom: 20px; /* Reduced margin */
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+            form label {
+                display: block;
+                margin-bottom: 5px; /* Reduced margin */
+                font-weight: bold;
+                color: #555;
+                font-size: 0.85em;
+            }
+
+            form input[type="text"],
+            form input[type="number"],
+            form input[type="date"],
+            form input[type="password"],
+            form textarea,
+            form select {
+                width: calc(100% - 16px); /* Adjusted for 8px padding on each side */
+                padding: 8px; /* Reduced padding */
+                margin-bottom: 12px; /* Reduced margin */
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+                font-size: 0.9em;
+            }
+
+            form button[type="submit"] {
+                padding: 8px 15px; /* Further reduced padding */
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 0.9em; /* Adjusted font size */
+                background-color: #007bff;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                font-weight: 600;
+                display: inline-flex; /* For icon alignment */
+                align-items: center;
+                gap: 5px;
+            }
+            form button[type="submit"]:hover {
+                background-color: #0056b3;
+                transform: translateY(-2px);
+            }
+
+            .cancel-button {
+                background-color: #6c757d;
+                color: white;
+                padding: 8px 15px; /* Further reduced padding */
+                border-radius: 5px;
+                text-decoration: none;
+                margin-left: 8px; /* Reduced margin */
+                display: inline-block;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                font-weight: 600;
+                display: inline-flex; /* For icon alignment */
+                align-items: center;
+                gap: 5px;
+            }
+            .cancel-button:hover {
+                background-color: #5a6268;
+                transform: translateY(-2px);
+            }
+
+        /* Flash Messages */
+        .flash-messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 12px 0; /* Reduced margin */
+        }
+
+            .flash-messages li {
+                padding: 10px; /* Reduced padding */
+                margin-bottom: 6px; /* Reduced margin */
+                border-radius: 6px; /* Slightly less rounded */
+                font-weight: bold;
+                border: 1px solid transparent;
+                font-size: 0.85em;
+                display: flex;
+                align-items: center;
+                gap: 6px; /* Reduced space for icon */
+            }
+
+            .flash-messages .success {
+                background-color: #d4edda;
+                color: #155724;
+                border-color: #c3e6cb;
+            }
+
+            .flash-messages .error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border-color: #f5c6cb;
+            }
+
+            .flash-messages .info {
+                background-color: #d1ecf1;
+                color: #0c5460;
+                border-color: #bee5eb;
+            }
+            .flash-messages .warning { /* Added for transaction alerts */
+                background-color: #fff3cd;
+                color: #856404;
+                border-color: #ffeeba;
+            }
+
+
+        /* Header and Footer Styles */
+        header, footer {
+            background-color: #ffffff;
+            padding: 0.8rem 1.2rem; /* Reduced padding */
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+            header h1 {
+                font-size: 1.6rem; /* Slightly smaller header font */
+                color: #0056b3;
+                font-weight: bold;
+                margin-bottom: 4px;
+            }
+
+            header p {
+                color: #555;
+                font-size: 0.8em;
+            }
+        
+        footer {
+            margin-top: 25px; /* Reduced margin-top */
+            border-top: 1px solid #eee;
+        }
+        footer p {
+            font-size: 0.75em; /* Slightly smaller footer font */
+            color: #777;
+        }
+
+        /* Filter Form for Transactions */
+        .filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px; /* Reduced space between filter elements */
+            align-items: flex-end;
+            background-color: #f0f8ff;
+            padding: 15px; /* Reduced padding */
+            border-radius: 10px;
+            border: 1px solid #cceeff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .filter-form span {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 140px; /* Reduced minimum width */
+        }
+        .filter-form label {
+            margin-bottom: 5px; /* Reduced margin */
+            font-size: 0.8em; /* Slightly smaller font */
+            color: #333;
+            font-weight: 600;
+        }
+        .filter-form input, .filter-form select {
+            width: 100%;
+            padding: 7px; /* Reduced padding */
+            margin-bottom: 0;
+            border-radius: 4px; /* Slightly less rounded */
+            font-size: 0.85em; /* Slightly smaller font */
+        }
+        .filter-form button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px; /* Reduced padding */
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em; /* Slightly smaller font */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .filter-form button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 25px; /* Reduced padding */
+            border-radius: 10px; /* Slightly less rounded */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Slightly less pronounced shadow */
+            text-align: center;
+            max-width: 380px; /* Reduced max-width */
+            width: 90%;
+            transform: translateY(-15px); /* Reduced animation distance */
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.3em; /* Reduced font size */
+            margin-bottom: 18px; /* Reduced margin */
+        }
+
+        .modal-content p {
+            margin-bottom: 20px; /* Reduced margin */
+            font-size: 0.95em; /* Reduced font size */
+            color: #555;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px; /* Reduced gap */
+        }
+
+        .modal-buttons button {
+            padding: 8px 18px; /* Reduced padding */
+            border: none;
+            border-radius: 5px; /* Slightly less rounded */
+            cursor: pointer;
+            font-size: 0.9em; /* Reduced font size */
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .modal-buttons .confirm-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .modal-buttons .confirm-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .modal-buttons .cancel-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .modal-buttons .cancel-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Specific modal types */
+        .modal-content.success h3 { color: #28a745; }
+        .modal-content.error h3 { color: #dc3545; }
+        .modal-content.info h3 { color: #17a2b8; }
+        .modal-content.alert .modal-buttons .confirm-btn { display: none; }
+        .modal-content.alert .modal-buttons .cancel-btn { background-color: #007bff; }
+
+        /* Tabs for Reports */
+        .tabs {
+            display: flex;
+            margin-bottom: 18px; /* Reduced margin */
+            border-bottom: 2px solid #ddd;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-button {
+            background-color: #f1f1f1;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 15px; /* Reduced padding */
+            transition: 0.3s;
+            font-size: 0.95em; /* Adjusted font size */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            margin-right: 2px; /* Reduced gap between tabs */
+            flex-shrink: 0;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .tab-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .tab-button.active {
+            background-color: #0056b3;
+            color: white;
+            border-bottom: 3px solid #0056b3;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 18px 0; /* Reduced padding */
+            border-top: none;
+            animation: fadeEffect 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeEffect {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Styles for sorting arrows */
+        .sort-link {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        .sort-link::after {
+            content: '';
+            width: 0;
+            height: 0;
+            margin-left: 5px; /* Reduced margin */
+            border-left: 3px solid transparent; /* Reduced arrow size */
+            border-right: 3px solid transparent;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.6);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .sort-link.active::after {
+            opacity: 1;
+            border-bottom-color: white;
+        }
+        .sort-link.active.desc::after {
+            border-top: 3px solid white;
+            border-bottom: none;
+        }
+        .sort-link.active.asc::after {
+            border-bottom: 3px solid white;
+            border-top: none;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            margin-top: 25px; /* Reduced margin */
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 5px; /* Reduced gap */
+        }
+        .page-link {
+            padding: 7px 10px; /* Reduced padding */
+            border: 1px solid #0056b3;
+            border-radius: 4px; /* Slightly less rounded */
+            text-decoration: none;
+            color: #0056b3;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+            font-size: 0.85em; /* Slightly smaller font */
+        }
+        .page-link:hover {
+            background-color: #0056b3;
+            color: white;
+            transform: translateY(-1px); /* Reduced lift */
+        }
+        .page-link.current {
+            background-color: #0056b3;
+            color: white;
+            font-weight: bold;
+            cursor: default;
+            transform: none;
+        }
+        .page-link.ellipsis {
+            border: none;
+            background: none;
+            color: #555;
+            cursor: default;
+            padding: 7px 3px; /* Adjusted padding */
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            .container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 8px;
+            }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            h3 { font-size: 1.2em; }
+
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+                padding: 5px 0;
+            }
+            .navbar a, .user-info {
+                padding: 8px 12px; /* Further reduced for mobile */
+                margin: 4px 0;
+                width: calc(100% - 24px);
+                box-sizing: border-box;
+                font-size: 0.85em;
+            }
+            .navbar a:hover, .navbar a.active {
+                transform: none;
+            }
+
+            .info-cards {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+            .card {
+                width: 95%;
+                min-width: unset;
+                margin-bottom: 0;
+                padding: 15px;
+            }
+            .card h3 {
+                font-size: 0.85em;
+            }
+            .card p {
+                font-size: 1.8em;
+            }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #ddd;
+                margin-bottom: 12px;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                font-size: 0.85em;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: #555;
+            }
+            .actions {
+                text-align: left;
+                padding-left: 6px;
+            }
+            .actions button, .actions a {
+                margin-right: 4px;
+                margin-bottom: 4px;
+                padding: 4px 7px; /* Further reduced for mobile */
+                font-size: 0.7em;
+            }
+
+            .filter-form {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 12px;
+            }
+            .filter-form span {
+                width: 100%;
+                min-width: unset;
+            }
+            .filter-form input, .filter-form select, .filter-form button {
+                width: 100%;
+                min-width: unset;
+                padding: 7px;
+            }
+            .filter-form button {
+                transform: none;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 6px; /* Further reduced for mobile */
+            }
+            .button-group a, .button-group button {
+                width: 100%;
+                margin-right: 0;
+                transform: none;
+                padding: 7px 12px; /* Further reduced for mobile */
+                font-size: 0.85em;
+            }
+
+            form {
+                padding: 15px;
+                border-radius: 8px;
+            }
+            form input[type="text"],
+            form input[type="number"],
+            form input[type="date"],
+            form input[type="password"],
+            form textarea,
+            form select {
+                width: calc(100% - 12px); /* Adjusted for mobile padding */
+                padding: 6px;
+            }
+            form button[type="submit"], .cancel-button {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 6px;
+                transform: none;
+                padding: 8px 15px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                border-radius: 8px;
+            }
+            .modal-content h3 {
+                font-size: 1.1em;
+            }
+            .modal-content p {
+                font-size: 0.85em;
+            }
+            .modal-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .modal-buttons button {
+                width: 100%;
+                transform: none;
+                padding: 8px 18px;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                border-bottom: none;
+            }
+            .tab-button {
+                width: auto;
+                flex-grow: 1;
+                margin-bottom: 4px;
+                border-bottom: 2px solid #ddd;
+                border-radius: 5px;
+                transform: none;
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+            .tab-button.active {
+                border-bottom: 3px solid #0056b3;
+                border-radius: 5px;
+            }
+            .tab-content {
+                padding: 15px 0;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .page-link {
+                padding: 6px 8px;
+                transform: none;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ការដ្ឋានចាក់សសរ និងលក់សសរគ្រឹះ បេស អង្គរ ផាយលីង</h1>
+        <p>ភូមិបឹងគ្រៀល សង្កាត់ឪឡោក ខណ្ឌកំបូល | ទូរស័ព្ទ៖ 081 / 085 558889</p>
+    </header>
+
+    <div class="container">
+        <nav class="navbar">
+            <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' else '' }}"><i class="fas fa-tachometer-alt"></i> ទំព័រដើម | Dashboard</a>
+            
+            {% if current_user.is_authenticated %}
+                {% if current_user.role in ['admin', 'manager', 'stock_keeper'] %}
+                    <a href="{{ url_for('manage_piles') }}" class="{{ 'active' if request.endpoint in ['manage_piles', 'add_pile', 'edit_pile'] else '' }}"><i class="fas fa-boxes"></i> គ្រប់គ្រងសសរ | Manage Piles</a>
+                {% endif %}
+                {% if current_user.role in ['admin', 'manager'] %}
+                    <a href="{{ url_for('manage_sites') }}" class="{{ 'active' if request.endpoint in ['manage_sites', 'add_customer_site', 'edit_customer_site'] else '' }}"><i class="fas fa-building"></i> គ្រប់គ្រងការដ្ឋាន | Manage Sites</a>
+                {% endif %}
+                {% if current_user.role in ['admin', 'manager', 'stock_keeper'] %}
+                    <a href="{{ url_for('manage_transactions') }}" class="{{ 'active' if request.endpoint in ['manage_transactions', 'add_transaction', 'edit_transaction'] else '' }}"><i class="fas fa-exchange-alt"></i> ប្រតិបត្តិការ | Transactions</a>
+                {% endif %}
+                {% if current_user.role in ['admin', 'manager'] %}
+                    <a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint == 'reports' else '' }}"><i class="fas fa-chart-line"></i> របាយការណ៍ | Reports</a>
+                {% endif %}
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('view_audit_log') }}" class="{{ 'active' if request.endpoint == 'view_audit_log' else '' }}"><i class="fas fa-history"></i> ប្រវត្តិសកម្មភាព | Audit Log</a>
+                    <a href="{{ url_for('register') }}" class="{{ 'active' if request.endpoint == 'register' else '' }}"><i class="fas fa-user-plus"></i> ចុះឈ្មោះអ្នកប្រើប្រាស់ | Register User</a>
+                {% endif %}
+                
+                <span class="user-info"><i class="fas fa-user-circle"></i> Hello, {{ current_user.username }} ({{ current_user.role.capitalize() }})!</span>
+                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ចេញ | Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> ចូល | Login</a>
+            {% endif %}
+        </nav>
+
+        {# Flash messages display area #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flash-messages">
+            {% for category, message in messages %}
+            <li class="{{ category }}">
+                {% if category == 'success' %}<i class="fas fa-check-circle"></i>
+                {% elif category == 'error' %}<i class="fas fa-times-circle"></i>
+                {% elif category == 'info' %}<i class="fas fa-info-circle"></i>
+                {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                {% endif %}
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; {{ g.current_year }} ការដ្ឋាន បេស អង្គរ ផាយលីង | Design by Best Angkor Tech Team</p>
+    </footer>
+
+    {# Modal Structure #}
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button id="modalConfirmBtn" class="confirm-btn">Yes</button>
+                <button id="modalCancelBtn" class="cancel-btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    {# External JavaScript Libraries #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        // Global Modal Variables
+        let currentModalCallback = null;
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+        // Function to show the custom modal
+        function showModal(message, type = 'alert', title = 'Confirmation | ការបញ្ជាក់', onConfirm = null) {
+            modalMessage.textContent = message;
+            modalTitle.textContent = title;
+            currentModalCallback = onConfirm;
+
+            // Reset classes
+            customModal.querySelector('.modal-content').className = 'modal-content';
+            modalConfirmBtn.style.display = 'inline-block'; // Show by default
+
+            if (type === 'alert') {
+                modalConfirmBtn.style.display = 'none'; // Hide confirm button for simple alerts
+                modalCancelBtn.textContent = 'OK | យល់ព្រម';
+                customModal.querySelector('.modal-content').classList.add('alert');
+            } else if (type === 'confirm') {
+                modalConfirmBtn.textContent = 'Yes | បាទ/ចាស';
+                modalCancelBtn.textContent = 'No | ទេ';
+                customModal.querySelector('.modal-content').classList.add('confirm');
+            } else if (type === 'success') {
+                modalConfirmBtn.style.display = 'none';
+                modalCancelBtn.textContent = 'OK | យល់ព្រម';
+                customModal.querySelector('.modal-content').classList.add('success');
+            } else if (type === 'error') {
+                modalConfirmBtn.style.display = 'none';
+                modalCancelBtn.textContent = 'OK | យល់ព្រម';
+                customModal.querySelector('.modal-content').classList.add('error');
+            } else if (type === 'info') {
+                modalConfirmBtn.style.display = 'none';
+                modalCancelBtn.textContent = 'OK | យល់ព្រម';
+                customModal.querySelector('.modal-content').classList.add('info');
+            } else if (type === 'warning') { /* Added for transaction alerts */
+                modalConfirmBtn.style.display = 'none';
+                modalCancelBtn.textContent = 'OK | យល់ព្រម';
+                customModal.querySelector('.modal-content').classList.add('warning');
+            }
+
+            customModal.classList.add('show');
+        }
+
+        // Function to hide the custom modal
+        function hideModal() {
+            customModal.classList.remove('show');
+            currentModalCallback = null; // Clear callback
+        }
+
+        // Event listeners for modal buttons
+        modalConfirmBtn.onclick = function() {
+            if (currentModalCallback) {
+                currentModalCallback(true);
+            }
+            hideModal();
+        };
+
+        modalCancelBtn.onclick = function() {
+            if (currentModalCallback) {
+                currentModalCallback(false);
+            }
+            hideModal();
+        };
+
+        // Global Export Functions (moved from individual templates)
+        function exportTableToExcel(tableID, filename = '') {
+            console.log('Attempting to export Excel for table:', tableID);
+            const tableSelect = document.getElementById(tableID);
+            if (!tableSelect) {
+                showModal('Table not found for Excel export.', 'error', 'Export Error');
+                console.error('Excel Export Error: Table element not found with ID:', tableID);
+                return;
+            }
+            try {
+                const wb = XLSX.utils.table_to_book(tableSelect, { sheet: filename || "Sheet1" });
+                XLSX.writeFile(wb, (filename ? filename.replace(/\s/g, '_') : 'excel_data') + ".xlsx");
+                showModal('Export to Excel completed!', 'success', 'Export Successful');
+                console.log('Excel export successful for table:', tableID);
+            } catch (e) {
+                showModal('Error exporting to Excel: ' + e.message, 'error', 'Export Error');
+                console.error('Error during Excel export:', e);
+            }
+        }
+
+        function exportTableToPDF(tableId, title = 'Report') {
+            console.log('Attempting to export PDF for table:', tableId);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Log the font URL being used
+            const fontUrl = '{{ url_for('static', filename='fonts/NotoSansKhmer-Regular.ttf') }}';
+            console.log('Font URL being used for PDF:', fontUrl);
+
+            try {
+                // Add Khmer font for PDF export (ensure font file is available in static/fonts)
+                // You MUST place 'NotoSansKhmer-Regular.ttf' in your 'static/fonts/' directory
+                // IMPORTANT: The problematic line `doc.addFileToVFS(...)` has been REMOVED from here.
+                // If you still see the 'get_base64_font' error, it means this file was NOT saved correctly.
+                doc.addFont(fontUrl, 'NotoSansKhmer', 'normal'); /* Changed font name */
+                doc.setFont('NotoSansKhmer'); /* Changed font name */
+                
+                doc.text(title + " | របាយការណ៍", 14, 20);
+
+                const table = document.getElementById(tableId);
+                if (!table) {
+                    showModal('Table not found for PDF export.', 'error', 'Export Error');
+                    console.error('PDF Export Error: Table element not found with ID:', tableId);
+                    return;
+                }
+
+                doc.autoTable({
+                    html: table,
+                    startY: 30,
+                    theme: 'grid',
+                    headStyles: { fillColor: [0, 86, 179] },
+                    styles: { font: "NotoSansKhmer", fontStyle: "normal", fontSize: 9, cellPadding: 3 }, /* Changed font name */
+                    columnStyles: {
+                        // Example: Adjust width for specific columns if needed
+                        // 0: { cellWidth: 15 }, // ID
+                        // 1: { cellWidth: 40 }, // Name/SKU
+                    }
+                });
+                doc.save((title.replace(/\s/g, '_') || 'report') + ".pdf");
+                showModal('Export to PDF completed!', 'success', 'Export Successful');
+                console.log('PDF export successful for table:', tableId);
+            } catch (e) {
+                showModal('Error exporting to PDF: ' + e.message + '. Please ensure NotoSansKhmer-Regular.ttf is in static/fonts/ and Flask can serve it.', 'error', 'Export Error'); /* Updated error message */
+                console.error('Error during PDF export:', e);
+            }
+        }
+
+        // DOMContentLoaded to ensure elements are loaded before script runs
+        document.addEventListener("DOMContentLoaded", function() {
+            // This is where you could potentially hook into Flask's flash messages
+            // and display them using the custom modal if desired.
+            // For now, we'll just let the Flask messages render as before.
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

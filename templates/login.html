@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Login | ចូលគណនី{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Login | ចូលគណនី</h2>
+    <form method="POST" action="{{ url_for('login') }}">
+        <label for="username">Username | ឈ្មោះអ្នកប្រើប្រាស់:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password | ពាក្យសម្ងាត់:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Login | ចូល</button>
+    </form>
+    <p style="text-align: center; margin-top: 20px;">
+        Don't have an account? | មិនទាន់មានគណនី? <a href="{{ url_for('register') }}">Register here | ចុះឈ្មោះនៅទីនេះ</a>
+    </p>
+</div>
+
+<style>
+    /* Specific styles for login/register forms */
+    .form-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-top: 5px solid #0056b3; /* Blue top border */
+    }
+    .form-container h2 {
+        text-align: center;
+        color: #0056b3;
+        margin-bottom: 30px;
+    }
+    .form-container label {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .form-container input[type="text"],
+    .form-container input[type="password"] {
+        width: calc(100% - 20px); /* Account for padding */
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .form-container button[type="submit"] {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .form-container button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    .form-container p {
+        font-size: 0.9em;
+        color: #555;
+    }
+    .form-container p a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .form-container p a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

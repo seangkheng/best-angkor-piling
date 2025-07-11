@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Customer/Site | បន្ថែមអតិថិជន/ការដ្ឋានថ្មី{% endblock %}
+
+{% block content %}
+<h2>Add New Customer/Site | បន្ថែមអតិថិជន/ការដ្ឋានថ្មី</h2>
+
+<form method="POST" action="{{ url_for('add_customer_site') }}">
+    <label for="name">Customer/Site Name | ឈ្មោះអតិថិជន/ការដ្ឋាន:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="address">Address | អាសយដ្ឋាន:</label>
+    <textarea id="address" name="address" rows="4"></textarea>
+
+    <label for="phone">Phone Number | លេខទូរស័ព្ទ:</label>
+    <input type="text" id="phone" name="phone">
+
+    <button type="submit"><i class="fas fa-plus-circle"></i> បន្ថែមអតិថិជន/ការដ្ឋាន | Add Customer/Site</button>
+    <a href="{{ url_for('manage_sites') }}" class="cancel-button"><i class="fas fa-times-circle"></i> បោះបង់ | Cancel</a>
+</form>
+{% endblock %}

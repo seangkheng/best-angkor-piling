@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Log | ប្រវត្តិសកម្មភាព{% endblock %}
+
+{% block content %}
+<h1>Audit Log | ប្រវត្តិសកម្មភាព</h1>
+
+<div class="button-group">
+    <button class="export-btn" onclick="exportTableToExcel('audit-log-table', 'Audit_Log_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
+    <button class="export-btn" onclick="exportTableToPDF('audit-log-table', 'Audit Log Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | Export to PDF</button>
+</div>
+
+<table id="audit-log-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Timestamp | ពេលវេលា</th>
+            <th>Username | ឈ្មោះអ្នកប្រើប្រាស់</th>
+            <th>Action | សកម្មភាព</th>
+            <th>Entity Type | ប្រភេទអង្គភាព</th>
+            <th>Entity ID | លេខសម្គាល់អង្គភាព</th>
+            <th>Details | ព័ត៌មានលម្អិត</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in audit_logs %}
+        <tr>
+            <td data-label="ID">{{ log.id }}</td>
+            <td data-label="Timestamp | ពេលវេលា">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td data-label="Username | ឈ្មោះអ្នកប្រើប្រាស់">{{ log.username }}</td>
+            <td data-label="Action | សកម្មភាព">{{ log.action }}</td>
+            <td data-label="Entity Type | ប្រភេទអង្គភាព">{{ log.entity_type or 'N/A' }}</td>
+            <td data-label="Entity ID | លេខសម្គាល់អង្គភាព">{{ log.entity_id or 'N/A' }}</td>
+            <td data-label="Details | ព័ត៌មានលម្អិត">{{ log.details or 'N/A' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7">No audit log entries found. | រកមិនឃើញកំណត់ហេតុសកម្មភាពទេ។</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{# Pagination Controls #}
+<div class="pagination">
+    {% if pagination.has_prev %}
+        <a href="{{ url_for('view_audit_log', page=pagination.prev_num, sort_by=sort_by, order=order) }}" class="page-link">&laquo; Previous</a>
+    {% else %}
+        <span class="page-link disabled">&laquo; Previous</span>
+    {% endif %}
+
+    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+            {% if pagination.page == page_num %}
+                <span class="page-link current">{{ page_num }}</span>
+            {% else %}
+                <a href="{{ url_for('view_audit_log', page=page_num, sort_by=sort_by, order=order) }}" class="page-link">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            <span class="page-link ellipsis">...</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+        <a href="{{ url_for('view_audit_log', page=pagination.next_num, sort_by=sort_by, order=order) }}" class="page-link">Next &raquo;</a>
+    {% else %}
+        <span class="page-link disabled">Next &raquo;</span>
+    {% endif %}
+</div>
+{% endblock %}
