@@ -1,0 +1,29 @@
+<!-- profile.html -->
+{% extends "base.html" %}
+
+{% block title %}User Profile | ប្រវត្តិរូបអ្នកប្រើប្រាស់{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>ប្រវត្តិរូបអ្នកប្រើប្រាស់ | User Profile</h1>
+</div>
+<div class="card" style="max-width: 600px; margin: auto;">
+    <h3>ផ្លាស់ប្តូរពាក្យសម្ងាត់ | Change Password</h3>
+    <p>អ្នកប្រើប្រាស់: <strong>{{ current_user.username }}</strong> ({{ current_user.role.capitalize() }})</p>
+    
+    <form method="POST" action="{{ url_for('profile') }}">
+        <label for="current_password">ពាក្យសម្ងាត់បច្ចុប្បន្ន | Current Password:</label>
+        <input type="password" id="current_password" name="current_password" required>
+
+        <label for="new_password">ពាក្យសម្ងាត់ថ្មី | New Password:</label>
+        <input type="password" id="new_password" name="new_password" required>
+
+        <label for="confirm_new_password">បញ្ជាក់ពាក្យសម្ងាត់ថ្មី | Confirm New Password:</label>
+        <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+
+        <div class="button-group" style="margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> ធ្វើបច្ចុប្បន្នភាព</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

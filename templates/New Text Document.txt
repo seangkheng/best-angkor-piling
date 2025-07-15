@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Best Angkor Piling App{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb; /* Blue 600 */
+            --primary-hover: #1d4ed8; /* Blue 700 */
+            --secondary-color: #4b5563; /* Gray 600 */
+            --danger-color: #dc2626; /* Red 600 */
+            --success-color: #16a34a; /* Green 600 */
+            --warning-color: #f59e0b; /* Amber 500 */
+            --bg-light: #f9fafb; /* Gray 50 */
+            --bg-white: #ffffff;
+            --text-dark: #1f2937; /* Gray 800 */
+            --text-light: #6b7280; /* Gray 500 */
+            --border-color: #e5e7eb; /* Gray 200 */
+            --font-family-khmer: 'Kantumruy Pro', 'Noto Sans Khmer', sans-serif;
+        }
+
+        /* --- General Styles --- */
+        body {
+            font-family: var(--font-family-khmer);
+            margin: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        h1 { font-size: 2em; margin-bottom: 1.5rem; }
+        h2 { font-size: 1.5em; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.2em; margin-bottom: 0.75rem; }
+
+        /* --- Header & Footer --- */
+        .main-header, .main-footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--bg-white);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .main-header h1 { font-size: 1.5rem; color: var(--primary-color); margin: 0; }
+        .main-header p { margin: 0.25rem 0 0 0; color: var(--text-light); }
+        .main-footer { margin-top: 2rem; border-top: 1px solid var(--border-color); font-size: 0.9em; }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            background-color: var(--bg-white);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+        }
+        .nav-links, .nav-user { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .navbar a {
+            color: var(--secondary-color);
+            padding: 0.6rem 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .navbar a:hover { background-color: #f3f4f6; color: var(--primary-color); }
+        .navbar a.active { background-color: var(--primary-color); color: white; }
+        .navbar a i { font-size: 1.1em; }
+        .nav-user a.logout { background-color: var(--danger-color); color: white; }
+        .nav-user a.logout:hover { background-color: #b91c1c; }
+
+        /* --- Buttons & Forms --- */
+        .button-group { margin-bottom: 1.5rem; display: flex; gap: 0.75rem; }
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-family: var(--font-family-khmer);
+            font-weight: 600;
+            font-size: 0.9em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-danger:hover { background-color: #b91c1c; }
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-secondary:hover { background-color: #374151; }
+        
+        .form-container {
+            background-color: var(--bg-white);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .form-container label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-container input, .form-container select, .form-container textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-sizing: border-box;
+            font-family: var(--font-family-khmer);
+            font-size: 1em;
+        }
+        .form-container input:focus, .form-container select:focus, .form-container textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        .filter-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        .filter-form input { flex-grow: 1; margin: 0; }
+        .filter-form button { margin: 0; }
+
+        /* --- Tables --- */
+        .table-wrapper {
+            overflow-x: auto;
+            background: var(--bg-white);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+        }
+        tr:last-child td { border-bottom: none; }
+        .actions .btn { padding: 0.4rem 0.8rem; font-size: 0.8em; }
+        .actions { display: flex; gap: 0.5rem; }
+
+        /* --- Flash Messages --- */
+        .flash-messages { list-style-type: none; padding: 0; margin: 0 0 1.5rem 0; }
+        .flash-messages li {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .flash-messages .success { background-color: #dcfce7; color: #166534; }
+        .flash-messages .error { background-color: #fee2e2; color: #991b1b; }
+        .flash-messages .info { background-color: #dbeafe; color: #1e40af; }
+        .flash-messages .warning { background-color: #fef3c7; color: #92400e; }
+
+        /* --- Pagination --- */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .pagination .page-link {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--secondary-color);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .pagination .page-link:hover { background-color: #f3f4f6; border-color: #d1d5db; }
+        .pagination .page-link.current { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination .page-link.disabled { color: #d1d5db; pointer-events: none; }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .navbar { flex-direction: column; gap: 0.5rem; }
+            .nav-links, .nav-user { width: 100%; justify-content: center; }
+            .filter-form { flex-direction: column; align-items: stretch; }
+            h1 { font-size: 1.5em; }
+            h2 { font-size: 1.25em; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <h1>ការដ្ឋាន បេស អង្គរ ផាយលីង</h1>
+        <p>ភូមិបឹងគ្រៀល សង្កាត់ឪឡោក ខណ្ឌកំបូល | ទូរស័ព្ទ៖ 081 / 085 558889</p>
+    </header>
+
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' else '' }}"><i class="fas fa-tachometer-alt"></i> ទំព័រដើម</a>
+                    <a href="{{ url_for('manage_piles') }}" class="{{ 'active' if request.endpoint and 'pile' in request.endpoint else '' }}"><i class="fas fa-boxes"></i> សសរ</a>
+                    <a href="{{ url_for('manage_sites') }}" class="{{ 'active' if request.endpoint and 'site' in request.endpoint else '' }}"><i class="fas fa-building"></i> ការដ្ឋាន</a>
+                    <a href="{{ url_for('manage_transactions') }}" class="{{ 'active' if request.endpoint and ('transaction' in request.endpoint or 'invoice' in request.endpoint) else '' }}"><i class="fas fa-exchange-alt"></i> ប្រតិបត្តិការ</a>
+                    <a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint == 'reports' else '' }}"><i class="fas fa-chart-line"></i> របាយការណ៍</a>
+                {% endif %}
+            </div>
+            <div class="nav-user">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('view_audit_log') }}" class="{{ 'active' if request.endpoint == 'view_audit_log' else '' }}"><i class="fas fa-history"></i></a>
+                        <a href="{{ url_for('settings') }}" class="{{ 'active' if request.endpoint == 'settings' else '' }}"><i class="fas fa-cog"></i></a>
+                    {% endif %}
+                    <a href="{{ url_for('profile') }}" class="{{ 'active' if request.endpoint == 'profile' else '' }}"><i class="fas fa-user-circle"></i> {{ current_user.username }}</a>
+                    <a href="{{ url_for('logout') }}" class="logout"><i class="fas fa-sign-out-alt"></i> ចេញ</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> ចូល</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flash-messages">
+            {% for category, message in messages %}
+            <li class="{{ category }}">
+                {% if category == 'success' %}<i class="fas fa-check-circle"></i>
+                {% elif category == 'error' %}<i class="fas fa-times-circle"></i>
+                {% elif category == 'info' %}<i class="fas fa-info-circle"></i>
+                {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <p>&copy; {{ current_year }} ការដ្ឋាន បេស អង្គរ ផាយលីង | Design by Hou seangKheng</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

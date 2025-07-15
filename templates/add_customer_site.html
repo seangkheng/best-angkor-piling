@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Add New Customer/Site | បន្ថែមអតិថិជន/ការដ្ឋានថ្មី{% endblock %}
+{% block title %}Add Customer/Site | បន្ថែមការដ្ឋាន{% endblock %}
 
 {% block content %}
-<h2>Add New Customer/Site | បន្ថែមអតិថិជន/ការដ្ឋានថ្មី</h2>
+<div class="page-header">
+    <h1>បន្ថែមអតិថិជន/ការដ្ឋានថ្មី | Add New Customer/Site</h1>
+</div>
 
-<form method="POST" action="{{ url_for('add_customer_site') }}">
-    <label for="name">Customer/Site Name | ឈ្មោះអតិថិជន/ការដ្ឋាន:</label>
-    <input type="text" id="name" name="name" required>
+<div class="card" style="max-width: 800px; margin: auto;">
+    <form method="POST" action="{{ url_for('add_customer_site') }}">
+        <label for="name">ឈ្មោះអតិថិជន/ការដ្ឋាន | Customer/Site Name:</label>
+        <input type="text" id="name" name="name" required>
 
-    <label for="address">Address | អាសយដ្ឋាន:</label>
-    <textarea id="address" name="address" rows="4"></textarea>
+        <label for="phone">លេខទូរស័ព្ទ | Phone Number:</label>
+        <input type="text" id="phone" name="phone">
 
-    <label for="phone">Phone Number | លេខទូរស័ព្ទ:</label>
-    <input type="text" id="phone" name="phone">
+        <label for="address">អាសយដ្ឋាន | Address:</label>
+        <textarea id="address" name="address" rows="4"></textarea>
 
-    <button type="submit"><i class="fas fa-plus-circle"></i> បន្ថែមអតិថិជន/ការដ្ឋាន | Add Customer/Site</button>
-    <a href="{{ url_for('manage_sites') }}" class="cancel-button"><i class="fas fa-times-circle"></i> បោះបង់ | Cancel</a>
-</form>
+        <div class="button-group" style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> បន្ថែមការដ្ឋាន</button>
+            <a href="{{ url_for('manage_sites') }}" class="btn btn-secondary"><i class="fas fa-times-circle"></i> បោះបង់</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

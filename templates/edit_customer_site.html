@@ -1,20 +1,28 @@
+<!-- edit_customer_site.html -->
 {% extends "base.html" %}
 
-{% block title %}Edit Customer Site - Best Angkor Piling App{% endblock %}
+{% block title %}Edit Customer/Site{% endblock %}
 
 {% block content %}
-<h2>Edit Customer Site: {{ site.name }} | កែសម្រួលការដ្ឋានអតិថិជន: {{ site.name }}</h2>
-<form method="POST" action="{{ url_for('edit_customer_site', site_id=site.id) }}">
-    <label for="name">Site Name | ឈ្មោះការដ្ឋាន:</label>
-    <input type="text" id="name" name="name" value="{{ site.name }}" required>
+<div class="page-header">
+    <h1>កែសម្រួលការដ្ឋាន: {{ site.name }}</h1>
+</div>
 
-    <label for="address">Address | អាសយដ្ឋាន:</label>
-    <textarea id="address" name="address" rows="3">{{ site.address if site.address is not none else '' }}</textarea>
+<div class="card" style="max-width: 800px; margin: auto;">
+    <form method="POST" action="{{ url_for('edit_customer_site', site_id=site.id) }}">
+        <label for="name">ឈ្មោះអតិថិជន/ការដ្ឋាន | Customer/Site Name:</label>
+        <input type="text" id="name" name="name" value="{{ site.name }}" required>
 
-    <label for="phone">Phone Number | លេខទូរស័ព្ទ:</label>
-    <input type="text" id="phone" name="phone" value="{{ site.phone if site.phone is not none else '' }}">
+        <label for="phone">លេខទូរស័ព្ទ | Phone Number:</label>
+        <input type="text" id="phone" name="phone" value="{{ site.phone or '' }}">
 
-    <button type="submit"><i class="fas fa-sync-alt"></i> ធ្វើបច្ចុប្បន្នភាពការដ្ឋានអតិថិជន | Update Customer Site</button>
-    <a href="{{ url_for('manage_sites') }}" class="cancel-button"><i class="fas fa-times-circle"></i> បោះបង់ | Cancel</a>
-</form>
+        <label for="address">អាសយដ្ឋាន | Address:</label>
+        <textarea id="address" name="address" rows="4">{{ site.address or '' }}</textarea>
+
+        <div class="button-group" style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> រក្សាទុកការផ្លាស់ប្តូរ</button>
+            <a href="{{ url_for('manage_sites') }}" class="btn btn-secondary"><i class="fas fa-times-circle"></i> បោះបង់</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

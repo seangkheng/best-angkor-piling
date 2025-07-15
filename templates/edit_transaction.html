@@ -8,11 +8,15 @@
     <label for="pile_id">Pile (SKU) | សសរ (SKU):</label>
     <select id="pile_id" name="pile_id" required>
         {% for pile in piles %}
-            <option value="{{ pile.id }}" {% if pile.id == transaction.pile_id %}selected{% endif %}>
+            <option value="{{ pile.id }}" data-length="{{ pile.length }}" {% if pile.id == transaction.pile_id %}selected{% endif %}>
                 {{ pile.sku }} ({{ pile.pile_type }} {{ pile.size }} L:{{ "%.1f"|format(pile.length) }}m)
             </option>
         {% endfor %}
     </select>
+
+    <label for="total_length">Total Length (m) | ប្រវែងសរុប (ម៉ែត្រ):</label>
+    <input type="number" step="any" id="total_length" name="total_length" min="0" value="{{ transaction.quantity * transaction.pile.length }}" required>
+    <small id="quantity_display" style="display: block; margin-top: -5px; margin-bottom: 10px; font-weight: bold;"></small>
 
     <label for="site_id">Customer Site (Optional) | ការដ្ឋានអតិថិជន (បើមាន):</label>
     <select id="site_id" name="site_id">
@@ -30,10 +34,7 @@
         <option value="out" {% if transaction.transaction_type == 'out' %}selected{% endif %}>Out (Sold) | លក់ចេញ</option>
     </select>
 
-    <label for="quantity">Quantity | បរិមាណ:</label>
-    <input type="number" id="quantity" name="quantity" min="1" value="{{ transaction.quantity }}" required>
-
-    <label for="unit_price_at_transaction">Unit Price at Transaction ($) | តម្លៃឯកតានៅពេលប្រតិបត្តិការ ($):</label>
+    <label for="unit_price_at_transaction">Unit Price per Meter ($) | តម្លៃឯកតាក្នុងមួយម៉ែត្រ ($):</label>
     <input type="number" step="0.01" id="unit_price_at_transaction" name="unit_price_at_transaction" value="{{ '%.2f'|format(transaction.unit_price_at_transaction) }}" required>
 
     <label for="notes">Notes | កំណត់ចំណាំ:</label>
@@ -42,4 +43,44 @@
     <button type="submit"><i class="fas fa-sync-alt"></i> ធ្វើបច្ចុប្បន្នភាព | Update Transaction</button>
     <a href="{{ url_for('manage_transactions') }}" class="cancel-button"><i class="fas fa-times-circle"></i> បោះបង់ | Cancel</a>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const pileSelect = document.getElementById('pile_id');
+    const lengthInput = document.getElementById('total_length');
+    const quantityDisplay = document.getElementById('quantity_display');
+
+    function updateQuantityInfo() {
+        const selectedOption = pileSelect.options[pileSelect.selectedIndex];
+        if (!selectedOption || !selectedOption.dataset.length || selectedOption.value === "") {
+            quantityDisplay.textContent = '';
+            return;
+        }
+
+        const pileLength = parseFloat(selectedOption.dataset.length);
+        const totalLength = parseFloat(lengthInput.value);
+
+        if (pileLength > 0 && totalLength > 0) {
+            const quantity = totalLength / pileLength;
+            if (totalLength % pileLength === 0) {
+                quantityDisplay.textContent = `ស្មើនឹង ${quantity} សសរ។`;
+                quantityDisplay.style.color = 'green';
+            } else {
+                quantityDisplay.textContent = `ប្រវែងសរុបត្រូវតែជាពហុគុណនៃ ${pileLength}m។`;
+                quantityDisplay.style.color = 'red';
+            }
+        } else {
+            quantityDisplay.textContent = '';
+        }
+    }
+    
+    // Call it once on page load to show initial state
+    updateQuantityInfo();
+
+    pileSelect.addEventListener('change', updateQuantityInfo);
+    lengthInput.addEventListener('input', updateQuantityInfo);
+});
+</script>
 {% endblock %}

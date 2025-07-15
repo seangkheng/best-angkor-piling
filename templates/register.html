@@ -3,27 +3,42 @@
 {% block title %}ចុះឈ្មោះអ្នកប្រើប្រាស់ | Register User{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>ចុះឈ្មោះអ្នកប្រើប្រាស់ថ្មី | Register New User</h2>
-    <form method="POST">
-        <label for="username">ឈ្មោះអ្នកប្រើប្រាស់ | Username:</label>
-        <input type="text" id="username" name="username" required>
+<div class="page-header">
+    <h1>ចុះឈ្មោះអ្នកប្រើប្រាស់ថ្មី | Register New User</h1>
+</div>
 
-        <label for="password">ពាក្យសម្ងាត់ | Password:</label>
-        <input type="password" id="password" name="password" required>
+<div class="card" style="max-width: 600px; margin: auto;">
+    <form method="POST" action="{{ url_for('register') }}">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="grid-column: 1 / -1;">
+                <label for="username">ឈ្មោះអ្នកប្រើប្រាស់ | Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div>
+                <label for="password">ពាក្យសម្ងាត់ | Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        <label for="confirm_password">បញ្ជាក់ពាក្យសម្ងាត់ | Confirm Password:</label> {# Added this line #}
-        <input type="password" id="confirm_password" name="confirm_password" required> {# Added this line #}
+            <div>
+                <label for="confirm_password">បញ្ជាក់ពាក្យសម្ងាត់ | Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
 
-        <label for="role">តួនាទី | Role:</label>
-        <select id="role" name="role" required>
-            <option value="stock_keeper">អ្នកគ្រប់គ្រងស្តុក | Stock Keeper</option>
-            <option value="manager">អ្នកគ្រប់គ្រង | Manager</option>
-            <option value="admin">អ្នកគ្រប់គ្រងប្រព័ន្ធ | Admin</option>
-        </select>
+            <div style="grid-column: 1 / -1;">
+                <label for="role">តួនាទី | Role:</label>
+                <select id="role" name="role" required>
+                    <option value="stock_keeper">អ្នកគ្រប់គ្រងស្តុក | Stock Keeper</option>
+                    <option value="manager">អ្នកគ្រប់គ្រង | Manager</option>
+                    <option value="admin">អ្នកគ្រប់គ្រងប្រព័ន្ធ | Admin</option>
+                </select>
+            </div>
+        </div>
 
-        <button type="submit"><i class="fas fa-user-plus"></i> ចុះឈ្មោះ | Register</button>
-        <a href="{{ url_for('login') }}" class="cancel-button"><i class="fas fa-sign-in-alt"></i> ត្រឡប់ទៅចូល | Back to Login</a>
+        <div class="button-group" style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus"></i> ចុះឈ្មោះ</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary"><i class="fas fa-times-circle"></i> បោះបង់</a>
+        </div>
     </form>
 </div>
 {% endblock %}

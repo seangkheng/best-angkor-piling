@@ -1,0 +1,22 @@
+<!-- settings.html -->
+{% extends "base.html" %}
+
+{% block title %}Application Settings | ការកំណត់កម្មវិធី{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>ការកំណត់កម្មវិធី | Application Settings</h1>
+</div>
+
+<div class="card" style="max-width: 600px; margin: auto;">
+    <form method="POST" action="{{ url_for('settings') }}">
+        <label for="low_stock_threshold">កម្រិតស្តុកទាប | Low Stock Threshold:</label>
+        <input type="number" id="low_stock_threshold" name="low_stock_threshold" value="{{ settings.get('low_stock_threshold', 10) }}" required>
+        <small style="color: var(--text-light);">នៅពេលស្តុកសសរធ្លាក់ក្រោមចំនួននេះ វានឹងបង្ហាញក្នុងបញ្ជីស្តុកទាបនៅទំព័រដើម។</small>
+
+        <div class="button-group" style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> រក្សាទុកការកំណត់</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -3,244 +3,216 @@
 {% block title %}Reports | របាយការណ៍{% endblock %}
 
 {% block content %}
-<h1>Reports | របាយការណ៍</h1>
-
-<div class="tabs">
-    <button class="tab-button active" onclick="showReport(event, 'current-stock-report')"><i class="fas fa-boxes"></i> Current Stock | ស្តុកបច្ចុប្បន្ន</button>
-    <button class="tab-button" onclick="showReport(event, 'sold-transactions-report')"><i class="fas fa-money-bill-wave"></i> Sold Transactions | ប្រតិបត្តិការលក់</button>
-    <button class="tab-button" onclick="showReport(event, 'received-transactions-report')"><i class="fas fa-truck-loading"></i> Received Transactions | ប្រតិបត្តិការទទួល</button>
-    <button class="tab-button" onclick="showReport(event, 'all-transactions-report')"><i class="fas fa-exchange-alt"></i> All Transactions | ប្រតិបត្តិការទាំងអស់</button>
-    <button class="tab-button" onclick="showReport(event, 'low-stock-piles-report')"><i class="fas fa-exclamation-triangle"></i> Low Stock Piles | សសរជិតអស់ស្តុក</button>
-    <button class="tab-button" onclick="showReport(event, 'profit-loss-report')"><i class="fas fa-chart-line"></i> Profit & Loss | ប្រាក់ចំណេញ & ខាត</button>
-</div>
-
-<div id="current-stock-report" class="tab-content active">
-    <h2>Current Stock Report | របាយការណ៍ស្តុកបច្ចុប្បន្ន</h2>
+<div class="page-header">
+    <h1>របាយការណ៍ | Reports</h1>
     <div class="button-group">
-        <button class="export-btn" onclick="exportTableToExcel('current-stock-table', 'Current_Stock_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-        <button class="export-btn" onclick="exportTableToPDF('current-stock-table', 'Current Stock Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | Export to PDF</button>
+        <button onclick="exportActiveTable('excel')" class="btn btn-secondary" style="background-color: #15803d;"><i class="fas fa-file-excel"></i> នាំចេញ Excel</button>
+        <button onclick="exportActiveTable('pdf')" class="btn btn-secondary" style="background-color: #b91c1c;"><i class="fas fa-file-pdf"></i> នាំចេញ PDF</button>
     </div>
-    <table id="current-stock-table">
-        <thead>
-            <tr>
-                <th>SKU</th>
-                <th>Pile Type | ប្រភេទសសរ</th>
-                <th>Size | ទំហំ</th>
-                <th>Length (m) | ប្រវែង</th>
-                <th>Current Stock | ស្តុកបច្ចុប្បន្ន</th>
-                <th>Unit Price | តម្លៃឯកតា</th>
-                <th>Total Value (Stock) | តម្លៃសរុប (ស្តុក)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pile in piles_current_stock %}
-            <tr>
-                <td data-label="SKU">{{ pile.sku }}</td>
-                <td data-label="Pile Type | ប្រភេទសសរ">{{ pile.pile_type }}</td>
-                <td data-label="Size | ទំហំ">{{ pile.size }}</td>
-                <td data-label="Length (m) | ប្រវែង">{{ "%.2f"|format(pile.length) }}</td>
-                <td data-label="Current Stock | ស្តុកបច្ចុប្បន្ន">{{ pile.current_stock }}</td>
-                <td data-label="Unit Price | តម្លៃឯកតា">${{ "%.2f"|format(pile.unit_price) }}</td>
-                <td data-label="Total Value (Stock) | តម្លៃសរុប (ស្តុក)">${{ "%.2f"|format(pile.current_stock * pile.unit_price) }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7">No piles in stock. | មិនមានសសរនៅក្នុងស្តុកទេ។</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 
-<div id="sold-transactions-report" class="tab-content">
-    <h2>Sold Transactions | ប្រតិបត្តិការលក់</h2>
-    <div class="button-group">
-        <button class="export-btn" onclick="exportTableToExcel('sold-transactions-table', 'Sold_Transactions_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-        <button class="export-btn" onclick="exportTableToPDF('sold-transactions-table', 'Sold Transactions Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | នាំចេញទៅ PDF</button>
+<div class="card">
+    <div class="tabs" style="border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+        <button class="tab-button active" onclick="showReport(event, 'profit-loss-report')"><i class="fas fa-chart-line"></i> ប្រាក់ចំណេញ & ខាត</button>
+        <button class="tab-button" onclick="showReport(event, 'current-stock-report')"><i class="fas fa-boxes"></i> ស្តុកបច្ចុប្បន្ន</button>
+        <button class="tab-button" onclick="showReport(event, 'sold-transactions-report')"><i class="fas fa-money-bill-wave"></i> ប្រតិបត្តិការលក់</button>
+        <button class="tab-button" onclick="showReport(event, 'received-transactions-report')"><i class="fas fa-truck-loading"></i> ប្រតិបត្តិការទទួល</button>
+        <button class="tab-button" onclick="showReport(event, 'low-stock-piles-report')"><i class="fas fa-exclamation-triangle"></i> ស្តុកទាប</button>
+        <button class="tab-button" onclick="showReport(event, 'all-transactions-report')"><i class="fas fa-exchange-alt"></i> ប្រតិបត្តិការទាំងអស់</button>
     </div>
-    <table id="sold-transactions-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Pile SKU</th>
-                <th>Quantity | បរិមាណ</th>
-                <th>Customer Site | ការដ្ឋានអតិថិជន</th>
-                <th>Unit Price at Transaction | តម្លៃឯកតានៅពេលប្រតិបត្តិការ</th>
-                <th>Total Value | តម្លៃសរុប</th>
-                <th>Date | កាលបរិច្ឆេទ</th>
-                <th>Notes | កំណត់ចំណាំ</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for transaction in sold_transactions %}
-            <tr>
-                <td data-label="ID">{{ transaction.id }}</td>
-                <td data-label="Pile SKU">{{ transaction.pile.sku }}</td>
-                <td data-label="Quantity | បរិមាណ">{{ transaction.quantity }}</td>
-                <td data-label="Customer Site | ការដ្ឋានអតិថិជន">{{ transaction.customer_site.name if transaction.customer_site else 'N/A' }}</td>
-                <td data-label="Unit Price at Transaction | តម្លៃឯកតានៅពេលប្រតិបត្តិការ">${{ "%.2f"|format(transaction.unit_price_at_transaction) }}</td>
-                <td data-label="Total Value | តម្លៃសរុប">${{ "%.2f"|format(transaction.total_value) }}</td>
-                <td data-label="Date | កាលបរិច្ឆេទ">{{ transaction.transaction_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td data-label="Notes | កំណត់ចំណាំ">{{ transaction.notes or 'N/A' }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="8">No sold transactions recorded. | មិនមានប្រតិបត្តិការលក់ណាមួយត្រូវបានកត់ត្រាទេ។</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-<div id="received-transactions-report" class="tab-content">
-    <h2>Received Transactions | ប្រតិបត្តិការទទួល</h2>
-    <div class="button-group">
-        <button class="export-btn" onclick="exportTableToExcel('received-transactions-table', 'Received_Transactions_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-        <button class="export-btn" onclick="exportTableToPDF('received-transactions-table', 'Received Transactions Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | នាំចេញទៅ PDF</button>
+    <!-- Tab Content: Profit & Loss -->
+    <div id="profit-loss-report" class="tab-content active">
+        <h2>Profit & Loss Report | របាយការណ៍ប្រាក់ចំណេញ & ខាត</h2>
+        <div style="padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <canvas id="profitLossChart" style="max-height: 300px;"></canvas>
+        </div>
+        <div class="table-wrapper">
+            <table id="profit-loss-table">
+                <tbody>
+                    <tr>
+                        <td>តម្លៃលក់សរុប | Total Sales Value</td>
+                        <td style="text-align: right;"><strong>${{ "%.2f"|format(total_sales_value) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>តម្លៃទំនិញលក់ចេញសរុប | Total Cost of Goods Sold (COGS)</td>
+                        <td style="text-align: right;">(${{ "%.2f"|format(total_cost_of_goods_sold) }})</td>
+                    </tr>
+                    <tr style="border-top: 2px solid var(--text-dark);">
+                        <td>ប្រាក់ចំណេញសរុប | Total Profit</td>
+                        <td style="text-align: right; font-weight: 700; font-size: 1.2em; color: {{ 'var(--success-color)' if total_profit >= 0 else 'var(--danger-color)' }};">
+                            ${{ "%.2f"|format(total_profit) }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table id="received-transactions-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Pile SKU</th>
-                <th>Quantity | បរិមាណ</th>
-                <th>Date | កាលបរិច្ឆេទ</th>
-                <th>Notes | កំណត់ចំណាំ</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for transaction in received_transactions %}
-            <tr>
-                <td data-label="ID">{{ transaction.id }}</td>
-                <td data-label="Pile SKU">{{ transaction.pile.sku }}</td>
-                <td data-label="Quantity | បរិមាណ">{{ transaction.quantity }}</td>
-                <td data-label="Date | កាលបរិច្ឆេទ">{{ transaction.transaction_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td data-label="Notes | កំណត់ចំណាំ">{{ transaction.notes or 'N/A' }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5">No received transactions recorded. | មិនមានប្រតិបត្តិការទទួលណាមួយត្រូវបានកត់ត្រាទេ។</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-<div id="all-transactions-report" class="tab-content">
-    <h2>All Transactions | ប្រតិបត្តិការទាំងអស់</h2>
-    <div class="button-group">
-        <button class="export-btn" onclick="exportTableToExcel('all-transactions-table', 'All_Transactions_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-        <button class="export-btn" onclick="exportTableToPDF('all-transactions-table', 'All Transactions Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | នាំចេញទៅ PDF</button>
+    <!-- Tab Content: Current Stock -->
+    <div id="current-stock-report" class="tab-content">
+        <h2>Current Stock Report | របាយការណ៍ស្តុកបច្ចុប្បន្ន</h2>
+        <div class="table-wrapper">
+            <table id="current-stock-table">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>ប្រភេទសសរ</th>
+                        <th>ស្តុក (ដើម)</th>
+                        <th>ថ្លៃដើមមធ្យម/ម</th>
+                        <th style="text-align: right;">តម្លៃស្តុករួម (ថ្លៃដើម)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pile in piles_current_stock %}
+                    <tr>
+                        <td><strong>{{ pile.sku }}</strong></td>
+                        <td>{{ pile.pile_type }} {{ pile.size }}</td>
+                        <td>{{ pile.current_stock }}</td>
+                        <td>${{ "%.2f"|format(pile.average_cost_per_meter) }}</td>
+                        <td style="text-align: right;">${{ "%.2f"|format(pile.current_stock * pile.length * pile.average_cost_per_meter) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No piles in stock.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table id="all-transactions-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date | កាលបរិច្ឆេទ</th>
-                <th>Pile SKU</th>
-                <th>Type | ប្រភេទ</th>
-                <th>Quantity | បរិមាណ</th>
-                <th>Customer Site | ការដ្ឋានអតិថិជន</th>
-                <th>Unit Price at Transaction | តម្លៃឯកតានៅពេលប្រតិបត្តិការ</th>
-                <th>Total Value | តម្លៃសរុប</th>
-                <th>Notes | កំណត់ចំណាំ</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for transaction in all_transactions %}
-            <tr>
-                <td data-label="ID">{{ transaction.id }}</td>
-                <td data-label="Date | កាលបរិច្ឆេទ">{{ transaction.transaction_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td data-label="Pile SKU">{{ transaction.pile.sku }}</td>
-                <td data-label="Type | ប្រភេទ" style="color: {{ 'green' if transaction.transaction_type == 'in' else 'red' }}; text-transform: uppercase;">
-                    {{ transaction.transaction_type }}
-                </td>
-                <td data-label="Quantity | បរិមាណ">{{ transaction.quantity }}</td>
-                <td data-label="Customer Site | ការដ្ឋានអតិថិជន">{{ transaction.customer_site.name if transaction.customer_site else 'N/A' }}</td>
-                <td data-label="Unit Price at Transaction | តម្លៃឯកតានៅពេលប្រតិបត្តិការ">${{ "%.2f"|format(transaction.unit_price_at_transaction) }}</td>
-                <td data-label="Total Value | តម្លៃសរុប">${{ "%.2f"|format(transaction.total_value) }}</td>
-                <td data-label="Notes | កំណត់ចំណាំ">{{ transaction.notes or 'N/A' }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="9">No transactions recorded. | មិនមានប្រតិបត្តិការណាមួយត្រូវបានកត់ត្រាទេ។</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div id="low-stock-piles-report" class="tab-content">
-    <h2>Low Stock Piles (Threshold: {{ low_stock_threshold }}) | សសរជិតអស់ស្តុក</h2>
-    <div class="button-group">
-        <button class="export-btn" onclick="exportTableToExcel('low-stock-piles-table', 'Low_Stock_Piles_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-        <button class="export-btn" onclick="exportTableToPDF('low-stock-piles-table', 'Low Stock Piles Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | នាំចេញទៅ PDF</button>
+    
+    <!-- Tab Content: Sold Transactions -->
+    <div id="sold-transactions-report" class="tab-content">
+        <h2>Sold Transactions | ប្រតិបត្តិការលក់</h2>
+        <div class="table-wrapper">
+            <table id="sold-transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>SKU</th>
+                        <th>Qty</th>
+                        <th>Total Sale</th>
+                        <th>Est. Cost</th>
+                        <th style="text-align: right;">Est. Profit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in sold_transactions %}
+                    <tr>
+                        <td>{{ t.transaction_date.strftime('%d-%b-%Y') }}</td>
+                        <td><strong>{{ t.pile.sku }}</strong></td>
+                        <td>{{ t.quantity }}</td>
+                        <td>${{ "%.2f"|format(t.total_value) }}</td>
+                        <td>${{ "%.2f"|format(t.cost_of_goods_sold) }}</td>
+                        <td style="text-align: right; font-weight: 600; color: {{ 'var(--success-color)' if (t.total_value - t.cost_of_goods_sold) >= 0 else 'var(--danger-color)' }};">
+                            ${{ "%.2f"|format(t.total_value - t.cost_of_goods_sold) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">No sold transactions recorded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table id="low-stock-piles-table">
-        <thead>
-            <tr>
-                <th>SKU</th>
-                <th>Pile Type | ប្រភេទសសរ</th>
-                <th>Size | ទំហំ</th>
-                <th>Length (m) | ប្រវែង</th>
-                <th>Current Stock | ស្តុកបច្ចុប្បន្ន</th>
-                <th>Unit Price | តម្លៃឯកតា</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pile in low_stock_piles %}
-            <tr>
-                <td data-label="SKU">{{ pile.sku }}</td>
-                <td data-label="Pile Type | ប្រភេទសសរ">{{ pile.pile_type }}</td>
-                <td data-label="Size | ទំហំ">{{ pile.size }}</td>
-                <td data-label="Length (m) | ប្រវែង">{{ "%.2f"|format(pile.length) }}</td>
-                <td data-label="Current Stock | ស្តុកបច្ចុប្បន្ន" style="color: red; font-weight: bold;">{{ pile.current_stock }}</td>
-                <td data-label="Unit Price | តម្លៃឯកតា">${{ "%.2f"|format(pile.unit_price) }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6">No piles are currently low on stock. | មិនមានសសរណាដែលខ្វះស្តុកទេ។</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-<div id="profit-loss-report" class="tab-content">
-    <h2>Profit & Loss Report | របាយការណ៍ប្រាក់ចំណេញ & ខាត</h2>
-    <div class="button-group">
-        <button class="export-btn" onclick="exportTableToExcel('profit-loss-table', 'Profit_Loss_Report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-        <button class="export-btn" onclick="exportTableToPDF('profit-loss-table', 'Profit & Loss Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | នាំចេញទៅ PDF</button>
+    <!-- Tab Content: Received Transactions -->
+    <div id="received-transactions-report" class="tab-content">
+         <h2>Received Transactions | ប្រតិបត្តិការទទួល</h2>
+         <div class="table-wrapper">
+            <table id="received-transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>SKU</th>
+                        <th>Qty</th>
+                        <th>Cost/Meter</th>
+                        <th style="text-align: right;">Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in received_transactions %}
+                    <tr>
+                        <td>{{ t.transaction_date.strftime('%d-%b-%Y') }}</td>
+                        <td><strong>{{ t.pile.sku }}</strong></td>
+                        <td>{{ t.quantity }}</td>
+                        <td>${{ "%.2f"|format(t.price_per_meter_at_transaction) }}</td>
+                        <td style="text-align: right;">${{ "%.2f"|format(t.total_value) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No received transactions recorded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table id="profit-loss-table">
-        <thead>
-            <tr>
-                <th>Description | ការពិពណ៌នា</th>
-                <th>Value | តម្លៃ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td data-label="Description | ការពិពណ៌នា">Total Sales Value | តម្លៃលក់សរុប</td>
-                <td data-label="Value | តម្លៃ">${{ "%.2f"|format(total_sales_value) }}</td>
-            </tr>
-            <tr>
-                <td data-label="Description | ការពិពណ៌នា">Estimated Cost of Goods Sold (COGS) | តម្លៃទំនិញលក់ចេញប៉ាន់ស្មាន</td>
-                <td data-label="Value | តម្លៃ">${{ "%.2f"|format(total_cost_of_goods_sold) }}</td>
-            </tr>
-            <tr>
-                <td data-label="Description | ការពិពណ៌នា">Total Profit | ប្រាក់ចំណេញសរុប</td>
-                <td data-label="Value | តម្លៃ" style="font-weight: bold; color: {{ 'green' if total_profit >= 0 else 'red' }};">${{ "%.2f"|format(total_profit) }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
 
+    <!-- Tab Content: All Transactions -->
+    <div id="all-transactions-report" class="tab-content">
+        <h2>All Transactions | ប្រតិបត្តិការទាំងអស់</h2>
+        <div class="table-wrapper">
+            <table id="all-transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>SKU</th>
+                        <th>Type</th>
+                        <th>Qty</th>
+                        <th style="text-align: right;">Value/Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in all_transactions %}
+                    <tr>
+                        <td>{{ t.transaction_date.strftime('%d-%b-%Y') }}</td>
+                        <td><strong>{{ t.pile.sku }}</strong></td>
+                        <td>
+                            <span style="font-weight: 700; color: {{ 'var(--success-color)' if t.transaction_type == 'in' else 'var(--danger-color)' }};">
+                                {{ t.transaction_type.upper() }}
+                            </span>
+                        </td>
+                        <td>{{ t.quantity }}</td>
+                        <td style="text-align: right;">${{ "%.2f"|format(t.total_value) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No transactions recorded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab Content: Low Stock -->
+    <div id="low-stock-piles-report" class="tab-content">
+        <h2>Low Stock Piles (Threshold: {{ low_stock_threshold }}) | សសរជិតអស់ស្តុក</h2>
+        <div class="table-wrapper">
+            <table id="low-stock-piles-table">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>ប្រភេទសសរ</th>
+                        <th style="text-align: right;">Current Stock (Unit)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pile in low_stock_piles %}
+                    <tr>
+                        <td><strong>{{ pile.sku }}</strong></td>
+                        <td>{{ pile.pile_type }} {{ pile.size }}</td>
+                        <td style="text-align: right; font-weight: 700; color: var(--danger-color);">{{ pile.current_stock }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" style="text-align: center; padding: 2rem;">No piles are currently low on stock.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script>
-    // Tab switching logic
     function showReport(evt, reportName) {
         let i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tab-content");
@@ -252,17 +224,53 @@
         for (i = 0; i < tablinks.length; i++) {
             tablinks[i].classList.remove("active");
         }
-        document.getElementById(reportName).style.display = "block";
-        document.getElementById(reportName).classList.add("active");
+        const activeTab = document.getElementById(reportName);
+        activeTab.style.display = "block";
+        activeTab.classList.add("active");
         evt.currentTarget.classList.add("active");
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        // Automatically open the first tab on page load
-        document.querySelector('.tab-button').click();
-    });
+    function exportActiveTable(format) {
+        const activeTabContent = document.querySelector('.tab-content.active');
+        if (!activeTabContent) { alert('Could not find active report tab.'); return; }
+        const table = activeTabContent.querySelector('table');
+        const titleElement = activeTabContent.querySelector('h2');
+        if (!table) { alert('Could not find table in the active report.'); return; }
+        const tableId = table.id;
+        const reportTitle = titleElement ? titleElement.textContent.split('|')[0].trim() : 'Report';
+        if (format === 'excel') { exportTableToExcel(tableId, reportTitle); } 
+        else if (format === 'pdf') { exportTableToPDF(tableId, reportTitle); }
+    }
 
-    // Export functions (exportExcel, exportPDF) are now global in base.html
-    // No need to redefine them here.
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector('.tab-button').click();
+        const chartData = JSON.parse('{{ profit_loss_chart_data|tojson|safe }}');
+        const profitCtx = document.getElementById('profitLossChart');
+        if (profitCtx && chartData.labels.length > 0) {
+            new Chart(profitCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        { label: 'Total Sales ($)', data: chartData.sales, borderColor: 'var(--primary-color)', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.3 },
+                        { label: 'Total Profit ($)', data: chartData.profit, borderColor: 'var(--success-color)', backgroundColor: 'rgba(22, 163, 74, 0.1)', fill: true, tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+        }
+    });
 </script>
+<style>
+    .tabs { display: flex; flex-wrap: wrap; }
+    .tab-button {
+        background-color: transparent; border: none; padding: 1rem; cursor: pointer;
+        font-weight: 600; color: var(--text-light); border-bottom: 2px solid transparent;
+        transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-button:hover { color: var(--primary-color); }
+    .tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+    .tab-content { display: none; padding-top: 1.5rem; }
+    .tab-content.active { display: block; }
+</style>
 {% endblock %}

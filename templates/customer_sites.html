@@ -1,60 +1,82 @@
+<!-- customer_sites.html -->
 {% extends "base.html" %}
 
 {% block title %}Manage Customers & Sites | គ្រប់គ្រងអតិថិជន & ការដ្ឋាន{% endblock %}
 
 {% block content %}
-<h1>Manage Customers & Sites | គ្រប់គ្រងអតិថិជន & ការដ្ឋាន</h1>
-
-<div class="button-group">
-    {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-        <a href="{{ url_for('add_customer_site') }}" class="add-button"><i class="fas fa-plus-circle"></i> បន្ថែមអតិថិជន/ការដ្ឋានថ្មី | Add New Customer/Site</a>
-    {% endif %}
-    <button class="export-btn" onclick="exportTableToExcel('customer-sites-table', 'customer_sites_report')"><i class="fas fa-file-excel"></i> នាំចេញទៅ Excel | Export to Excel</button>
-    <button class="export-btn" onclick="exportTableToPDF('customer-sites-table', 'Customer Sites Report')"><i class="fas fa-file-pdf"></i> នាំចេញទៅ PDF | នាំចេញទៅ PDF</button>
+<div class="page-header">
+    <h1>គ្រប់គ្រងអតិថិជន & ការដ្ឋាន</h1>
+    <div class="button-group">
+        {% if current_user.role in ['admin', 'manager'] %}
+        <a href="{{ url_for('add_customer_site') }}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> បន្ថែមការដ្ឋានថ្មី</a>
+        {% endif %}
+    </div>
 </div>
 
-<table id="customer-sites-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Customer/Site Name | ឈ្មោះអតិថិជន/ការដ្ឋាន</th>
-            <th>Address | អាសយដ្ឋាន</th>
-            <th>Phone | លេខទូរស័ព្ទ</th>
-            <th>Created At | បង្កើតនៅថ្ងៃ</th>
-            <th>Actions | សកម្មភាព</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for site in customer_sites %}
-        <tr>
-            <td data-label="ID">{{ site.id }}</td>
-            <td data-label="Customer/Site Name | ឈ្មោះអតិថិជន/ការដ្ឋាន">{{ site.name }}</td>
-            <td data-label="Address | អាសយដ្ឋាន">{{ site.address if site.address is not none else 'N/A' }}</td>
-            <td data-label="Phone | លេខទូរស័ព្ទ">{{ site.phone if site.phone is not none else 'N/A' }}</td>
-            <td data-label="Created At | បង្កើតនៅថ្ងៃ">{{ site.created_at.strftime('%Y-%m-%d %H:%M:%S') if site.created_at else 'N/A' }}</td>
-            <td data-label="Actions | សកម្មភាព" class="actions">
-                {% if current_user.is_authenticated and current_user.role in ['admin', 'manager'] %}
-                    <a href="{{ url_for('edit_customer_site', site_id=site.id) }}" class="edit-button"><i class="fas fa-edit"></i> កែសម្រួល</a>
-                {% endif %}
-                {% if current_user.is_authenticated and current_user.role == 'admin' %}
-                    <form method="POST" action="{{ url_for('delete_customer_site', site_id=site.id) }}" onsubmit="event.preventDefault(); showModal('Are you sure you want to delete this customer site? This action cannot be undone and may fail if there are associated transactions! | ប្រាកដទេថាចង់លុបការដ្ឋានអតិថិជននេះ? សកម្មភាពនេះមិនអាចផ្លាស់ប្ដូរវិញបានទេ ហើយអាចនឹងបរាជ័យប្រសិនបើមានប្រតិបត្តិការពាក់ព័ន្ធ!', 'confirm', 'Confirm Deletion | បញ្ជាក់ការលុប', function(result) { if (result) this.closest('form').submit(); }.bind(this));">
-                        <button type="submit" class="delete-button"><i class="fas fa-trash-alt"></i> លុប</button>
-                    </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6">No customer sites found. | រកមិនឃើញការដ្ឋានអតិថិជនទេ។</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
+<div class="card">
+    <form method="GET" action="{{ url_for('manage_sites') }}" class="filter-form">
+        <input type="text" name="search" placeholder="ស្វែងរកតាមឈ្មោះ, អាសយដ្ឋាន, លេខទូរស័ព្ទ..." value="{{ search_term or '' }}">
+        <button type="submit" class="btn btn-secondary"><i class="fas fa-search"></i> ស្វែងរក</button>
+    </form>
 
-{% block scripts %}
-<script>
-    // Export functions are now in base.html, so no need to define them here.
-    // Just ensure the onclick calls are correct.
-</script>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>ឈ្មោះអតិថិជន/ការដ្ឋាន</th>
+                    <th>អាសយដ្ឋាន</th>
+                    <th>លេខទូរស័ព្ទ</th>
+                    <th>បង្កើតនៅថ្ងៃ</th>
+                    <th>សកម្មភាព</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for site in customer_sites %}
+                <tr>
+                    <td>{{ site.id }}</td>
+                    <td><strong>{{ site.name }}</strong></td>
+                    <td>{{ site.address or 'N/A' }}</td>
+                    <td>{{ site.phone or 'N/A' }}</td>
+                    <td>{{ site.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="actions">
+                        {% if current_user.role in ['admin', 'manager'] %}
+                        <a href="{{ url_for('edit_customer_site', site_id=site.id) }}" class="btn btn-secondary btn-icon" title="កែសម្រួល"><i class="fas fa-edit"></i></a>
+                        {% endif %}
+                        {% if current_user.role == 'admin' %}
+                        <form method="POST" action="{{ url_for('delete_customer_site', site_id=site.id) }}" onsubmit="return confirm('Are you sure you want to delete this site?');">
+                            <button type="submit" class="btn btn-danger btn-icon" title="លុប"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem;">រកមិនឃើញការដ្ឋានអតិថិជនទេ។</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('manage_sites', page=pagination.prev_num, search=search_term) }}" class="page-link">&laquo;</a>
+        {% else %}
+            <span class="page-link disabled">&laquo;</span>
+        {% endif %}
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                <a href="{{ url_for('manage_sites', page=page_num, search=search_term) }}" class="page-link {{ 'current' if pagination.page == page_num else '' }}">{{ page_num }}</a>
+            {% else %}
+                <span class="page-link">...</span>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+            <a href="{{ url_for('manage_sites', page=pagination.next_num, search=search_term) }}" class="page-link">&raquo;</a>
+        {% else %}
+            <span class="page-link disabled">&raquo;</span>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
