@@ -12,8 +12,26 @@
 </div>
 
 <div class="card">
+    <form method="GET" action="{{ url_for('reports') }}" class="filter-form">
+        <div>
+            <label for="start_date">ថ្ងៃចាប់ផ្តើម | Start Date</label>
+            <input type="date" id="start_date" name="start_date" value="{{ start_date or '' }}">
+        </div>
+        <div>
+            <label for="end_date">ថ្ងៃបញ្ចប់ | End Date</label>
+            <input type="date" id="end_date" name="end_date" value="{{ end_date or '' }}">
+        </div>
+        <div style="align-self: flex-end;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> ត្រងរបាយការណ៍</button>
+        </div>
+    </form>
+</div>
+
+
+<div class="card">
     <div class="tabs" style="border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem;">
         <button class="tab-button active" onclick="showReport(event, 'profit-loss-report')"><i class="fas fa-chart-line"></i> ប្រាក់ចំណេញ & ខាត</button>
+        <button class="tab-button" onclick="showReport(event, 'expense-report')"><i class="fas fa-wallet"></i> ការចំណាយ</button>
         <button class="tab-button" onclick="showReport(event, 'current-stock-report')"><i class="fas fa-boxes"></i> ស្តុកបច្ចុប្បន្ន</button>
         <button class="tab-button" onclick="showReport(event, 'sold-transactions-report')"><i class="fas fa-money-bill-wave"></i> ប្រតិបត្តិការលក់</button>
         <button class="tab-button" onclick="showReport(event, 'received-transactions-report')"><i class="fas fa-truck-loading"></i> ប្រតិបត្តិការទទួល</button>
@@ -23,10 +41,7 @@
 
     <!-- Tab Content: Profit & Loss -->
     <div id="profit-loss-report" class="tab-content active">
-        <h2>Profit & Loss Report | របាយការណ៍ប្រាក់ចំណេញ & ខាត</h2>
-        <div style="padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <canvas id="profitLossChart" style="max-height: 300px;"></canvas>
-        </div>
+        <h2>របាយការណ៍ប្រាក់ចំណេញ & ខាត (សម្រាប់រយៈពេលដែលបានជ្រើសរើស)</h2>
         <div class="table-wrapper">
             <table id="profit-loss-table">
                 <tbody>
@@ -38,14 +53,56 @@
                         <td>តម្លៃទំនិញលក់ចេញសរុប | Total Cost of Goods Sold (COGS)</td>
                         <td style="text-align: right;">(${{ "%.2f"|format(total_cost_of_goods_sold) }})</td>
                     </tr>
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td><strong>ប្រាក់ចំណេញដុល | Gross Profit</strong></td>
+                        <td style="text-align: right;"><strong>${{ "%.2f"|format(gross_profit) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>ការចំណាយប្រតិបត្តិការសរុប | Total Operating Expenses</td>
+                        <td style="text-align: right;">(${{ "%.2f"|format(total_expenses) }})</td>
+                    </tr>
                     <tr style="border-top: 2px solid var(--text-dark);">
-                        <td>ប្រាក់ចំណេញសរុប | Total Profit</td>
-                        <td style="text-align: right; font-weight: 700; font-size: 1.2em; color: {{ 'var(--success-color)' if total_profit >= 0 else 'var(--danger-color)' }};">
-                            ${{ "%.2f"|format(total_profit) }}
+                        <td><strong>ប្រាក់ចំណេញសុទ្ធ | Net Profit</strong></td>
+                        <td style="text-align: right; font-weight: 700; font-size: 1.2em; color: {{ 'var(--success-color)' if net_profit >= 0 else 'var(--danger-color)' }};">
+                            ${{ "%.2f"|format(net_profit) }}
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Tab Content: Expenses -->
+    <div id="expense-report" class="tab-content">
+        <h2>របាយការណ៍ចំណាយ (សម្រាប់រយៈពេលដែលបានជ្រើសរើស)</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center;">
+            <div class="table-wrapper">
+                <table id="expense-details-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense.expense_date.strftime('%d-%b-%Y') }}</td>
+                            <td>{{ expense.description }}</td>
+                            <td><span class="badge">{{ expense.category.name }}</span></td>
+                            <td style="text-align: right;">${{ "%.2f"|format(expense.amount) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" style="text-align: center; padding: 2rem;">No expenses recorded for the selected period.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="max-height: 300px;">
+                 <canvas id="expenseChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -108,7 +165,7 @@
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">No sold transactions recorded.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">No sold transactions recorded for the selected period.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -139,7 +196,7 @@
                         <td style="text-align: right;">${{ "%.2f"|format(t.total_value) }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No received transactions recorded.</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No received transactions recorded for the selected period.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -174,7 +231,7 @@
                         <td style="text-align: right;">${{ "%.2f"|format(t.total_value) }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No transactions recorded.</td></tr>
+                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">No transactions recorded for the selected period.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -244,19 +301,23 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelector('.tab-button').click();
-        const chartData = JSON.parse('{{ profit_loss_chart_data|tojson|safe }}');
-        const profitCtx = document.getElementById('profitLossChart');
-        if (profitCtx && chartData.labels.length > 0) {
-            new Chart(profitCtx, {
-                type: 'line',
+
+        // Expense Doughnut Chart
+        const expenseChartData = JSON.parse('{{ expense_chart_data|tojson|safe }}');
+        const expenseCtx = document.getElementById('expenseChart');
+        if (expenseCtx && expenseChartData.labels.length > 0) {
+            new Chart(expenseCtx, {
+                type: 'doughnut',
                 data: {
-                    labels: chartData.labels,
-                    datasets: [
-                        { label: 'Total Sales ($)', data: chartData.sales, borderColor: 'var(--primary-color)', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.3 },
-                        { label: 'Total Profit ($)', data: chartData.profit, borderColor: 'var(--success-color)', backgroundColor: 'rgba(22, 163, 74, 0.1)', fill: true, tension: 0.3 }
-                    ]
+                    labels: expenseChartData.labels,
+                    datasets: [{
+                        label: 'Expenses by Category',
+                        data: expenseChartData.values,
+                        backgroundColor: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef'],
+                        borderWidth: 0
+                    }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Expenses by Category' } } }
             });
         }
     });
@@ -272,5 +333,6 @@
     .tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
     .tab-content { display: none; padding-top: 1.5rem; }
     .tab-content.active { display: block; }
+    .badge { background-color: var(--secondary-color); color: white; padding: 0.2em 0.6em; border-radius: 0.5rem; font-size: 0.8em; }
 </style>
 {% endblock %}

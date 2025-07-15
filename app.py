@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, g, 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
 import os
 from functools import wraps
 from sqlalchemy.orm import joinedload
@@ -13,11 +14,16 @@ import json
 # Initialize Flask application
 app = Flask(__name__)
 
-# Configure database
+# Configure database and upload folder
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'best_angkor_piling.db')
+UPLOAD_FOLDER = os.path.join(basedir, 'static/uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'best_angkor_piling.db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_super_secret_key_here')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a_very_strong_and_random_secret_key_for_production')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 # Initialize SQLAlchemy and Flask-Login
 db = SQLAlchemy(app)
@@ -72,6 +78,20 @@ class Transaction(db.Model):
     transaction_date = db.Column(db.DateTime, default=datetime.now)
     notes = db.Column(db.Text)
 
+class ExpenseCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    expenses = db.relationship('Expense', backref='category', lazy=True, cascade="all, delete-orphan")
+
+class Expense(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(255), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    expense_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    category_id = db.Column(db.Integer, db.ForeignKey('expense_category.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='expenses', lazy=True)
+
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
@@ -89,13 +109,22 @@ class Setting(db.Model):
     value = db.Column(db.String(200), nullable=False)
 
 # --- Helper Functions and Decorators ---
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @login_manager.user_loader
 def load_user(user_id): return User.query.get(int(user_id))
 
 @app.context_processor
 def inject_global_vars():
     low_stock_setting = Setting.query.filter_by(key='low_stock_threshold').first()
-    return dict(current_year=datetime.now().year, low_stock_threshold=int(low_stock_setting.value) if low_stock_setting else 10)
+    background_image_setting = Setting.query.filter_by(key='background_image').first()
+    return dict(
+        current_year=datetime.now().year,
+        low_stock_threshold=int(low_stock_setting.value) if low_stock_setting else 10,
+        background_image_filename=background_image_setting.value if background_image_setting else None
+    )
 
 @app.before_request
 def before_request(): g.db = db.session
@@ -272,13 +301,25 @@ def add_transaction():
     customer_sites = CustomerSite.query.order_by(CustomerSite.name).all()
     if request.method == 'POST':
         pile_id = request.form.get('pile_id')
+        transaction_date_str = request.form.get('transaction_date')
+        try:
+            transaction_date = datetime.strptime(transaction_date_str, '%Y-%m-%d')
+        except (ValueError, TypeError):
+            transaction_date = datetime.now()
+        
+        total_length_input = float(request.form.get('total_length', 0))
+        price_per_meter = float(request.form.get('price_per_meter_at_transaction', 0))
+        transaction_type = request.form.get('transaction_type')
+        transport_fee = float(request.form.get('transport_fee', 0))
+        crane_fee = float(request.form.get('crane_fee', 0))
+        notes = request.form.get('notes')
+        site_id = request.form.get('site_id')
+
         if not pile_id:
             flash('Please select a pile.', 'error')
             return render_template('add_transaction.html', piles=piles, customer_sites=customer_sites, piles_data=json.dumps(piles_data))
         
         pile = Pile.query.get_or_404(pile_id)
-        total_length_input = float(request.form.get('total_length', 0))
-
         if pile.length <= 0 or (total_length_input > 0 and total_length_input % pile.length != 0):
             flash(f'ប្រវែងសរុប ({total_length_input}m) មិនត្រឹមត្រូវសម្រាប់សសរប្រវែង {pile.length}m។', 'error')
             return render_template('add_transaction.html', piles=piles, customer_sites=customer_sites, piles_data=json.dumps(piles_data))
@@ -288,15 +329,8 @@ def add_transaction():
             flash('សូមបញ្ចូលប្រវែងសរុបឱ្យបានត្រឹមត្រូវ។', 'error')
             return render_template('add_transaction.html', piles=piles, customer_sites=customer_sites, piles_data=json.dumps(piles_data))
         
-        price_per_meter = float(request.form.get('price_per_meter_at_transaction', 0))
-        transaction_type = request.form['transaction_type']
-        
-        transport_fee = float(request.form.get('transport_fee', 0))
-        crane_fee = float(request.form.get('crane_fee', 0))
-        
         pile_value = price_per_meter * total_length_input
         total_value = pile_value + transport_fee + crane_fee
-        
         cogs_for_this_transaction = 0.0
 
         if transaction_type == 'in':
@@ -318,16 +352,9 @@ def add_transaction():
             pile.current_stock -= quantity
 
         new_transaction = Transaction(
-            pile_id=pile_id,
-            site_id=request.form.get('site_id') if request.form.get('site_id') else None,
-            transaction_type=transaction_type,
-            quantity=quantity,
-            price_per_meter_at_transaction=price_per_meter,
-            total_value=total_value,
-            cost_of_goods_sold=cogs_for_this_transaction,
-            transport_fee=transport_fee,
-            crane_fee=crane_fee,
-            notes=request.form.get('notes')
+            pile_id=pile_id, site_id=site_id if site_id else None, transaction_type=transaction_type, quantity=quantity,
+            price_per_meter_at_transaction=price_per_meter, total_value=total_value, cost_of_goods_sold=cogs_for_this_transaction,
+            transport_fee=transport_fee, crane_fee=crane_fee, notes=notes, transaction_date=transaction_date
         )
         db.session.add(new_transaction)
         db.session.commit()
@@ -373,24 +400,131 @@ def delete_transaction(transaction_id):
     log_audit_event('delete_transaction', 'Transaction', transaction_id, f'Deleted transaction for {pile.sku}.')
     return redirect(url_for('manage_transactions'))
 
-# --- Reports and Audit Log ---
+# --- Expense Management Routes ---
+@app.route('/expenses')
+@login_required
+@role_required(['admin', 'manager'])
+def manage_expenses():
+    page = request.args.get('page', 1, type=int)
+    expenses_query = Expense.query.options(joinedload(Expense.category)).order_by(Expense.expense_date.desc())
+    pagination = expenses_query.paginate(page=page, per_page=10, error_out=False)
+    categories = ExpenseCategory.query.order_by(ExpenseCategory.name).all()
+    return render_template('expenses.html', expenses=pagination.items, pagination=pagination, categories=categories)
+
+@app.route('/expenses/add', methods=['POST'])
+@login_required
+@role_required(['admin', 'manager'])
+def add_expense():
+    description = request.form.get('description')
+    amount = float(request.form.get('amount', 0))
+    expense_date_str = request.form.get('expense_date')
+    category_id = int(request.form.get('category_id'))
+    try:
+        expense_date = datetime.strptime(expense_date_str, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        expense_date = datetime.now()
+    if not description or amount <= 0 or not category_id:
+        flash('Invalid expense data provided.', 'error')
+        return redirect(url_for('manage_expenses'))
+    new_expense = Expense(description=description, amount=amount, expense_date=expense_date, category_id=category_id, user_id=current_user.id)
+    db.session.add(new_expense)
+    db.session.commit()
+    log_audit_event('add_expense', 'Expense', new_expense.id, f'Added expense: {description} for ${amount}')
+    flash('Expense added successfully.', 'success')
+    return redirect(url_for('manage_expenses'))
+
+@app.route('/expenses/delete/<int:expense_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_expense(expense_id):
+    expense = Expense.query.get_or_404(expense_id)
+    db.session.delete(expense)
+    db.session.commit()
+    log_audit_event('delete_expense', 'Expense', expense_id, f'Deleted expense: {expense.description}')
+    flash('Expense deleted successfully.', 'success')
+    return redirect(url_for('manage_expenses'))
+
+@app.route('/expense_categories', methods=['GET', 'POST'])
+@login_required
+@role_required('admin')
+def manage_expense_categories():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        if name:
+            existing_category = ExpenseCategory.query.filter_by(name=name).first()
+            if not existing_category:
+                new_category = ExpenseCategory(name=name)
+                db.session.add(new_category)
+                db.session.commit()
+                flash('Expense category added successfully.', 'success')
+            else:
+                flash('Category name already exists.', 'error')
+        else:
+            flash('Category name cannot be empty.', 'error')
+        return redirect(url_for('manage_expense_categories'))
+    categories = ExpenseCategory.query.order_by(ExpenseCategory.name).all()
+    return render_template('expense_categories.html', categories=categories)
+
+@app.route('/expense_categories/delete/<int:category_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_expense_category(category_id):
+    category = ExpenseCategory.query.get_or_404(category_id)
+    if category.expenses:
+        flash('Cannot delete category with associated expenses.', 'error')
+        return redirect(url_for('manage_expense_categories'))
+    db.session.delete(category)
+    db.session.commit()
+    flash('Expense category deleted successfully.', 'success')
+    return redirect(url_for('manage_expense_categories'))
+    
+# --- Reports Route ---
 @app.route('/reports')
 @login_required
 @role_required(['admin', 'manager'])
 def reports():
-    low_stock_threshold = g.get('low_stock_threshold', 10)
-    sold_transactions = Transaction.query.filter_by(transaction_type='out').order_by(Transaction.transaction_date.desc()).all()
-    received_transactions = Transaction.query.filter_by(transaction_type='in').order_by(Transaction.transaction_date.desc()).all()
-    all_transactions = Transaction.query.order_by(Transaction.transaction_date.desc()).all()
-    piles_current_stock = Pile.query.order_by(Pile.sku).all()
-    low_stock_piles = Pile.query.filter(Pile.current_stock < low_stock_threshold).all()
-    total_sales_value = db.session.query(func.sum(Transaction.total_value)).filter_by(transaction_type='out').scalar() or 0.0
-    total_cost_of_goods_sold = db.session.query(func.sum(Transaction.cost_of_goods_sold)).filter_by(transaction_type='out').scalar() or 0.0
-    total_profit = total_sales_value - total_cost_of_goods_sold
-    sales_by_month = db.session.query(func.strftime('%Y-%m', Transaction.transaction_date).label('month'), func.sum(Transaction.total_value).label('total_sales'), func.sum(Transaction.cost_of_goods_sold).label('total_cogs')).filter(Transaction.transaction_type == 'out').group_by('month').order_by('month').all()
-    profit_loss_chart_data = {'labels': [s.month for s in sales_by_month], 'sales': [s.total_sales for s in sales_by_month], 'profit': [s.total_sales - s.total_cogs for s in sales_by_month]}
-    return render_template('reports.html', piles_current_stock=piles_current_stock, sold_transactions=sold_transactions, received_transactions=received_transactions, all_transactions=all_transactions, low_stock_piles=low_stock_piles, total_sales_value=total_sales_value, total_cost_of_goods_sold=total_cost_of_goods_sold, total_profit=total_profit, profit_loss_chart_data=json.dumps(profit_loss_chart_data))
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    today = datetime.today()
+    if not start_date_str:
+        start_date = today.replace(day=1)
+    else:
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+    if not end_date_str:
+        end_date = today
+    else:
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+    end_date_inclusive = end_date + timedelta(days=1)
 
+    sold_transactions = Transaction.query.filter_by(transaction_type='out').filter(Transaction.transaction_date >= start_date, Transaction.transaction_date < end_date_inclusive).order_by(Transaction.transaction_date.desc()).all()
+    received_transactions = Transaction.query.filter_by(transaction_type='in').filter(Transaction.transaction_date >= start_date, Transaction.transaction_date < end_date_inclusive).order_by(Transaction.transaction_date.desc()).all()
+    all_transactions = Transaction.query.filter(Transaction.transaction_date >= start_date, Transaction.transaction_date < end_date_inclusive).order_by(Transaction.transaction_date.desc()).all()
+    expenses = Expense.query.options(joinedload(Expense.category)).filter(Expense.expense_date >= start_date, Expense.expense_date < end_date_inclusive).order_by(Expense.expense_date.desc()).all()
+    
+    total_sales_value = db.session.query(func.sum(Transaction.total_value)).filter(Transaction.transaction_type == 'out', Transaction.transaction_date >= start_date, Transaction.transaction_date < end_date_inclusive).scalar() or 0.0
+    total_cost_of_goods_sold = db.session.query(func.sum(Transaction.cost_of_goods_sold)).filter(Transaction.transaction_type == 'out', Transaction.transaction_date >= start_date, Transaction.transaction_date < end_date_inclusive).scalar() or 0.0
+    total_expenses = db.session.query(func.sum(Expense.amount)).filter(Expense.expense_date >= start_date, Expense.expense_date < end_date_inclusive).scalar() or 0.0
+    gross_profit = total_sales_value - total_cost_of_goods_sold
+    net_profit = gross_profit - total_expenses
+
+    expenses_by_category = db.session.query(ExpenseCategory.name, func.sum(Expense.amount)).join(Expense).filter(Expense.expense_date >= start_date, Expense.expense_date < end_date_inclusive).group_by(ExpenseCategory.name).all()
+    expense_chart_data = {'labels': [e[0] for e in expenses_by_category], 'values': [e[1] for e in expenses_by_category]}
+    
+    piles_current_stock = Pile.query.order_by(Pile.sku).all()
+    low_stock_threshold = g.get('low_stock_threshold', 10)
+    low_stock_piles = Pile.query.filter(Pile.current_stock < low_stock_threshold).all()
+
+    return render_template('reports.html', 
+                           total_sales_value=total_sales_value, total_cost_of_goods_sold=total_cost_of_goods_sold,
+                           gross_profit=gross_profit, total_expenses=total_expenses, net_profit=net_profit,
+                           expense_chart_data=json.dumps(expense_chart_data),
+                           expenses=expenses,
+                           sold_transactions=sold_transactions, received_transactions=received_transactions,
+                           all_transactions=all_transactions, piles_current_stock=piles_current_stock,
+                           low_stock_piles=low_stock_piles, start_date=start_date.strftime('%Y-%m-%d'),
+                           end_date=end_date.strftime('%Y-%m-%d'))
+
+# --- Audit Log Route ---
 @app.route('/audit_log')
 @login_required
 @role_required('admin')
@@ -465,6 +599,7 @@ def profile():
 @role_required('admin')
 def settings():
     if request.method == 'POST':
+        # Handle regular form data
         for key, value in request.form.items():
             setting = Setting.query.filter_by(key=key).first()
             if setting:
@@ -472,10 +607,32 @@ def settings():
             else:
                 new_setting = Setting(key=key, value=value)
                 db.session.add(new_setting)
+
+        # Handle file upload for background image
+        if 'background_image' in request.files:
+            file = request.files['background_image']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # Ensure the upload folder exists
+                if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                    os.makedirs(app.config['UPLOAD_FOLDER'])
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                
+                # Save filename to database
+                bg_setting = Setting.query.filter_by(key='background_image').first()
+                if bg_setting:
+                    bg_setting.value = filename
+                else:
+                    new_bg_setting = Setting(key='background_image', value=filename)
+                    db.session.add(new_bg_setting)
+                
+                flash('Background image updated successfully.', 'success')
+
         db.session.commit()
         log_audit_event('update_settings', 'Application', details='Admin updated application settings.')
         flash('Settings updated successfully.', 'success')
         return redirect(url_for('settings'))
+
     settings_dict = {s.key: s.value for s in Setting.query.all()}
     return render_template('settings.html', settings=settings_dict)
 

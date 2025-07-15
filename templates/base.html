@@ -22,8 +22,17 @@
         }
         *, *::before, *::after { box-sizing: border-box; }
         body {
-            font-family: var(--font-family-khmer); margin: 0; background-color: var(--bg-light);
-            color: var(--text-dark); line-height: 1.6; -webkit-font-smoothing: antialiased;
+            font-family: var(--font-family-khmer); 
+            margin: 0; 
+            /* UPDATED: Added user's background image */
+            background-color: #374151; /* A dark gray fallback color */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('http://googleusercontent.com/file_content/uploaded:photo_2024-02-26_17-40-20.jpg-c0d0d2cc-25cc-4ae5-b0d3-d988d48c25cb');
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed; /* Creates a nice parallax effect */
+            color: var(--text-dark); 
+            line-height: 1.6; 
+            -webkit-font-smoothing: antialiased;
         }
         .main-wrapper { display: flex; min-height: 100vh; }
         .sidebar {
@@ -43,8 +52,8 @@
         .sidebar-footer { margin-top: auto; text-align: center; font-size: 0.8em; color: var(--text-light); }
         
         .main-content { flex-grow: 1; padding: 2rem; overflow-y: auto; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .page-header h1 { margin: 0; font-size: 2em; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .page-header h1 { margin: 0; font-size: 2em; color: var(--bg-white); text-shadow: 1px 1px 3px rgba(0,0,0,0.4); }
         .button-group { display: flex; gap: 0.75rem; }
         .btn {
             padding: 0.6rem 1.2rem; border: none; border-radius: 0.5rem; cursor: pointer;
@@ -62,8 +71,11 @@
         .btn-icon { padding: 0.6rem; }
         
         .card {
-            background-color: var(--bg-white); padding: 1.5rem; border-radius: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
+            backdrop-filter: blur(5px); /* Frosted glass effect */
+            padding: 1.5rem; border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .form-container label, .card label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
         .form-container input, .card input, .form-container select, .card select, .form-container textarea, .card textarea {
@@ -73,18 +85,42 @@
         .form-container input:focus, .card input:focus, .form-container select:focus, .card select:focus, .form-container textarea:focus, .card textarea:focus {
             outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
         }
-        .filter-form { display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center; }
+        .filter-form { display: flex; gap: 1rem; align-items: center; }
         .filter-form input { flex-grow: 1; margin: 0; }
         .filter-form button { margin: 0; }
 
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th {
-            background-color: #f9fafb; font-weight: 600; text-transform: uppercase;
-            font-size: 0.8em; letter-spacing: 0.5px; color: var(--text-light);
+        .table-wrapper { 
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
         }
-        tr:last-child td { border-bottom: none; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 1rem;
+            vertical-align: middle;
+            border: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75em;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        tbody tr {
+            transition: background-color 0.15s ease-in-out;
+        }
+        tbody tr:hover {
+            background-color: #eff6ff;
+        }
         .actions { display: flex; gap: 0.5rem; }
         .actions .btn { padding: 0.4rem 0.8rem; font-size: 0.8em; }
 
@@ -112,6 +148,32 @@
             background: var(--bg-white); border: 1px solid var(--border-color);
             border-radius: 0.5rem; padding: 0.5rem; cursor: pointer;
         }
+        
+        .main-header {
+            background-color: var(--bg-white);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 0.5rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee-animation 30s linear infinite;
+        }
+        .marquee span {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .marquee span::after {
+            content: "  -  ";
+            margin: 0 2em;
+        }
+        @keyframes marquee-animation {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
 
         @media (max-width: 992px) {
             .sidebar {
@@ -126,12 +188,20 @@
     </style>
 </head>
 <body>
+    <header class="main-header">
+        <div class="marquee">
+            <span>ការដ្ឋាន បេស អង្គរ ផាយលីង</span>
+            <span>Best Angkor Piling</span>
+            <span>ភូមិបឹងគ្រៀល សង្កាត់ឪឡោក ខណ្ឌកំបូល</span>
+            <span>ទូរស័ព្ទ៖ 081 / 085 558889</span>
+            <span>Deverloper by Hou Seangkheng</span>
+        </div>
+    </header>
+
     <div class="main-wrapper">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1>បេស អង្គរ ផាយលីង</h1>
-                <h1>ភូមិបឹងគ្រៀល សង្កាត់ឪឡោក ខណ្ឌកំបូល</h1>
-                <h1>ទូរស័ព្ទ៖ 081 / 085 558889</h1>
             </div>
             <nav class="main-nav">
                 {% if current_user.is_authenticated %}
@@ -139,6 +209,7 @@
                     <a href="{{ url_for('manage_piles') }}" class="{{ 'active' if request.endpoint and 'pile' in request.endpoint else '' }}"><i class="fas fa-boxes"></i> គ្រប់គ្រងសសរ</a>
                     <a href="{{ url_for('manage_sites') }}" class="{{ 'active' if request.endpoint and 'site' in request.endpoint else '' }}"><i class="fas fa-building"></i> គ្រប់គ្រងការដ្ឋាន</a>
                     <a href="{{ url_for('manage_transactions') }}" class="{{ 'active' if request.endpoint and ('transaction' in request.endpoint or 'invoice' in request.endpoint) else '' }}"><i class="fas fa-exchange-alt"></i> ប្រតិបត្តិការ</a>
+                    <a href="{{ url_for('manage_expenses') }}" class="{{ 'active' if request.endpoint and 'expense' in request.endpoint else '' }}"><i class="fas fa-wallet"></i> ការគ្រប់គ្រងចំណាយ</a>
                     <a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint == 'reports' else '' }}"><i class="fas fa-chart-line"></i> របាយការណ៍</a>
                     {% if current_user.role == 'admin' %}
                         <a href="{{ url_for('view_audit_log') }}" class="{{ 'active' if request.endpoint == 'view_audit_log' else '' }}"><i class="fas fa-history"></i> ប្រវត្តិសកម្មភាព</a>
@@ -153,7 +224,7 @@
             </nav>
             <div class="sidebar-footer">
                 <p>&copy; {{ current_year }} Best Angkor Piling</p>
-                <p>Design by Hou Seangkheng</p>
+                <p>Deverloper by Hou Seangkheng</p>
             </div>
         </aside>
 
@@ -204,23 +275,51 @@
             } catch (e) { alert('Error exporting to Excel: ' + e.message); }
         }
 
-        function exportTableToPDF(tableId, title = 'Report') {
+        async function exportTableToPDF(tableId, title = 'Report') {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const table = document.getElementById(tableId);
-            if (!table) { alert('Error: Table not found for export.'); return; }
-            
-            // Note: For custom fonts in jsPDF, you need to load the font file.
-            // This example uses a standard font for simplicity. For Khmer, you would need
-            // to load a base64 encoded font or have the font file available.
-            doc.text(title, 14, 20);
-            doc.autoTable({
-                html: '#' + tableId,
-                startY: 30,
-                theme: 'grid',
-                headStyles: { fillColor: [37, 99, 235] },
-            });
-            doc.save((title.replace(/\s/g, '_') || 'report') + ".pdf");
+            if (!table) {
+                alert('Error: Table not found for export.');
+                return;
+            }
+
+            try {
+                const fontUrl = "{{ url_for('static', filename='fonts/KantumruyPro-Regular.ttf') }}";
+                const response = await fetch(fontUrl);
+                if (!response.ok) throw new Error(`Font file not found at ${fontUrl}`);
+                
+                const font = await response.arrayBuffer();
+                const fontName = 'KantumruyPro';
+                
+                const fontBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(font)));
+
+                doc.addFileToVFS(`${fontName}-normal.ttf`, fontBase64);
+                doc.addFont(`${fontName}-normal.ttf`, fontName, 'normal');
+                doc.setFont(fontName);
+
+                doc.text(title, 14, 20);
+                doc.autoTable({
+                    html: '#' + tableId,
+                    startY: 30,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [37, 99, 235],
+                        font: fontName,
+                        fontStyle: 'normal'
+                    },
+                    styles: {
+                        font: fontName,
+                        fontStyle: 'normal'
+                    },
+                });
+
+                doc.save((title.replace(/\s/g, '_') || 'report') + ".pdf");
+
+            } catch (error) {
+                console.error("PDF Export Error:", error);
+                alert('Failed to export PDF with Khmer font. Please ensure the font file exists at /static/fonts/KantumruyPro-Regular.ttf and check the console for errors.');
+            }
         }
     </script>
     {% endblock %}
